@@ -3,6 +3,7 @@ import './globals.css'
 // eslint-disable-next-line camelcase
 import { Inter, Poppins, Open_Sans } from 'next/font/google'
 import { ReactNode } from 'react'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 
@@ -44,9 +45,21 @@ export default function RootLayout({
       lang="pt-br"
       className={`${inter.variable} ${poppins.variable} ${openSans.variable}`}
     >
-      <Navbar />
-      <body className={inter.className}>{children}</body>
-      <Footer />
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <header>
+            <Navbar />
+          </header>
+
+          {children}
+        </ThemeProvider>
+        <Footer />
+      </body>
     </html>
   )
 }
