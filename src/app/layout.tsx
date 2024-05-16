@@ -1,10 +1,33 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-import { Navbar } from '@/components/navbar'
+// eslint-disable-next-line camelcase
+import { Inter, Poppins, Open_Sans } from 'next/font/google'
 import { ReactNode } from 'react'
+import { Navbar } from '@/components/navbar'
+import { Footer } from '@/components/footer'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-poppins',
+  style: ['italic', 'normal'],
+  weight: ['400', '700', '900'],
+  preload: true,
+})
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-openSans',
+  style: ['italic', 'normal'],
+  weight: ['400', '700'],
+})
 
 export const metadata: Metadata = {
   title: 'Megazord',
@@ -17,9 +40,13 @@ export default function RootLayout({
   children: ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="pt-br"
+      className={`${inter.variable} ${poppins.variable} ${openSans.variable}`}
+    >
       <Navbar />
       <body className={inter.className}>{children}</body>
+      <Footer />
     </html>
   )
 }

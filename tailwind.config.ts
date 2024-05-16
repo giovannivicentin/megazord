@@ -18,7 +18,17 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        inter: ['var(--font-inter)'],
+        poppins: ['var(--font-poppins)'],
+        openSans: ['var(--font-openSans)'],
+      },
       colors: {
+        'brand-color-100': '#569EFF',
+        'brand-color-200': '#0169F2',
+        'brand-color-300': '#010CC8',
+        'brand-color-400': '#01008C',
+        'brand-color-500': '#02016D',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

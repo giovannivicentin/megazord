@@ -1,7 +1,7 @@
 export function Navbar() {
   return (
     <nav>
-      <p>ASDASDASDASD</p>
+      <p>navbar</p>
     </nav>
   )
 }
