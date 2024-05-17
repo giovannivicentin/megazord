@@ -18,20 +18,24 @@ export function Navbar() {
                   height="60"
                   className="mb-3 invert dark:invert-0"
                 ></Image>
-                <Image
-                  src="/megazordWhite.png"
-                  alt="Megazord Phrase Logo"
-                  width="100"
-                  height="50"
-                  className="invert dark:invert-0"
-                ></Image>
-                <Image
-                  src="/hashBlack.png"
-                  alt="Megazord Phrase Logo"
-                  width="40"
-                  height="25"
-                  className="dark:invert"
-                ></Image>
+                <div className='flex flex-col items-center'>
+                  <Image
+                    src="/megazordWhite.png"
+                    alt="Megazord Phrase Logo"
+                    width="100"
+                    height="50"
+                    className="invert dark:invert-0"
+                  ></Image>
+                  <Image
+                    src="/hashBlack.png"
+                    alt="Megazord Phrase Logo"
+                    width="40"
+                    height="25"
+                    className="dark:invert"
+                  ></Image>
+
+                </div>
+
               </div>
             </Link>
           </li>
