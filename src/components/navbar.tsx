@@ -7,10 +7,12 @@ import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { useState, useEffect } from 'react'
 import { FiMenu, FiX } from 'react-icons/fi'
+import { items } from '../lib/items'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [randomPage, setRandomPage] = useState(getRandomPage())
 
   const toggleMenu = () => {
     setIsAnimating(true)
@@ -38,6 +40,16 @@ export function Navbar() {
       document.removeEventListener('mousedown', handleOutsideClick)
     }
   }, [isMenuOpen])
+
+  function getRandomPage() {
+    const randomIndex = Math.floor(Math.random() * items.length)
+    return items[randomIndex].pageToGo
+  }
+
+  const handleButtonClick = () => {
+    const newRandomPage = getRandomPage()
+    setRandomPage(newRandomPage)
+  }
 
   return (
     <nav>
@@ -74,7 +86,9 @@ export function Navbar() {
           </li>
         </ul>
         <div className="hidden md:flex gap-4">
-          <Button>Jogar Agora</Button>
+          <Link href={randomPage}>
+            <Button onClick={handleButtonClick}>Jogar Agora</Button>
+          </Link>
           <ModeToggle />
         </div>
         <div className="flex items-center gap-4 md:hidden menu-toggle">
@@ -99,7 +113,9 @@ export function Navbar() {
               onClick={closeMenu}
             />
             <div className="flex flex-col mt-10">
-              <Button>Jogar Agora</Button>
+              <Link href={randomPage}>
+                <Button onClick={handleButtonClick}>Jogar Agora</Button>
+              </Link>
             </div>
           </div>
         </div>
