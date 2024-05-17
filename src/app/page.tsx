@@ -3,18 +3,45 @@ import Link from 'next/link'
 export default function Home() {
   const items = [
     {
-      name: 'Elementos da Tabela Periodica',
-      pageToGo: '/elementos-da-tabela-periodica',
+      name: 'Elementos da Tabela Periódica',
+      pageToGo: '/periodic-table-elements',
     },
-    { name: 'Relógio de Sol', pageToGo: '/relogio-de-sol' },
-    { name: 'Circuito Elétrico', pageToGo: '/circuito-eletrico' },
-    { name: 'Catapulta', pageToGo: '/catapulta' },
-    { name: 'Carrinho Movido a Balão', pageToGo: '/carrinho-movido-a-balao' },
-    { name: 'Quebra Cabeça', pageToGo: '/quebra-cabeca' },
-    { name: 'Quadro Branco', pageToGo: '/quadro-branco' },
-    { name: 'Chess and Checkers', pageToGo: '/chess-and-checkers' },
-    { name: 'Tic Tac Toe', pageToGo: '/tic-tac-toe' },
-    { name: 'Math Spinner', pageToGo: '/math-spinner' },
+    {
+      name: 'Relógio de Sol',
+      pageToGo: '/sundial',
+    },
+    {
+      name: 'Circuito Elétrico',
+      pageToGo: '/electric-circuit',
+    },
+    {
+      name: 'Catapulta',
+      pageToGo: '/catapult',
+    },
+    {
+      name: 'Quebra Cabeça',
+      pageToGo: '/puzzle',
+    },
+    {
+      name: 'Quadro Branco',
+      pageToGo: '/whiteboard',
+    },
+    {
+      name: 'Xadrez',
+      pageToGo: '/chess',
+    },
+    {
+      name: 'Damas',
+      pageToGo: '/checkers',
+    },
+    {
+      name: 'Jogo da Velha',
+      pageToGo: '/tic-tac-toe',
+    },
+    {
+      name: 'Spinner de Matemática',
+      pageToGo: '/math-spinner',
+    },
   ]
 
   return (
