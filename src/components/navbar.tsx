@@ -109,12 +109,14 @@ export function Navbar() {
             onAnimationEnd={() => setIsAnimating(false)}
           >
             <FiX
-              className="absolute top-4 right-4 text-2xl cursor-pointer"
+              className="absolute top-4 right-4 text-2xl cursor-pointer hover:text-primary"
               onClick={closeMenu}
             />
             <div className="flex flex-col mt-10">
               <Link href={randomPage}>
-                <Button onClick={handleButtonClick}>Jogar Agora</Button>
+                <Button className="w-full" onClick={handleButtonClick}>
+                  Jogar Agora
+                </Button>
               </Link>
             </div>
           </div>
