@@ -41,7 +41,7 @@ export function Navbar() {
 
   return (
     <nav>
-      <div className="flex justify-between items-center mx-8 md:mx-16">
+      <div className="flex justify-between items-center mx-4 md:mx-16">
         <ul className="flex items-center">
           <li>
             <Link href="/">
