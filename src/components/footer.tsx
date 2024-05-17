@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer>
+    <footer className="flex flex-col items-center">
       <p>footer</p>
     </footer>
   )

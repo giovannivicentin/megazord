@@ -4,7 +4,7 @@ export default function Home() {
   const items = [
     {
       name: 'Elementos da Tabela Periódica',
-      pageToGo: '/periodic-table-elements',
+      pageToGo: '/periodic-table',
     },
     {
       name: 'Relógio de Sol',
