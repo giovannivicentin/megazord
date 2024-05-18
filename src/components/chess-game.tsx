@@ -12,17 +12,16 @@ function ChessGame() {
   const [game] = useState(new Chess())
   const [fen, setFen] = useState('start')
   const [errorMessage, setErrorMessage] = useState('')
-  const [currentTurn, setCurrentTurn] = useState('Brancas')
+  const [player, setPlayer] = useState('Brancas')
 
   useEffect(() => {
     setFen(game.fen())
-    setCurrentTurn(game.turn() === 'w' ? 'Brancas' : 'Pretas')
   }, [game])
 
   const handleMove = (move: {
     from: string
     to: string
-    promotion?: PieceSymbol | undefined // Use PieceSymbol type for promotion.
+    promotion?: PieceSymbol | undefined
   }) => {
     try {
       const result = game.move({
@@ -34,6 +33,7 @@ function ChessGame() {
         throw new Error('Movimento inválido')
       }
       setFen(game.fen())
+      setPlayer(player === 'Brancas' ? 'Pretas' : 'Brancas')
       setErrorMessage('')
     } catch (error) {
       setErrorMessage('Movimento inválido')
@@ -43,13 +43,13 @@ function ChessGame() {
   const handleUndoMove = () => {
     game.undo()
     setFen(game.fen())
-    setCurrentTurn(game.turn() === 'w' ? 'Brancas' : 'Pretas')
+    setPlayer(player === 'brancas' ? 'pretas' : 'brancas')
   }
 
   return (
     <>
       <div className="flex items-center">
-        <p className="my-2 text-lg text-center">É a vez das {currentTurn}</p>
+        <p className="my-2 text-lg text-center">É a vez das {player}</p>{' '}
         {errorMessage && (
           <Alert
             className={cn(
