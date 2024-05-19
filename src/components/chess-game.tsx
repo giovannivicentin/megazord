@@ -1,8 +1,7 @@
 'use client'
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
-import { IoIosReturnLeft } from 'react-icons/io'
-import { Chess, PieceSymbol } from 'chess.ts'
+import { Chess, PieceSymbol } from 'chess.js'
 import { Button } from './ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
@@ -50,7 +49,7 @@ function ChessGame() {
   const handleUndoMove = () => {
     game.undo()
     setFen(game.fen())
-    setPlayer(player === 'brancas' ? 'pretas' : 'brancas')
+    setPlayer(player === 'Brancas' ? 'Pretas' : 'Brancas')
   }
 
   return (
@@ -82,12 +81,14 @@ function ChessGame() {
             })
           }
         />
-        <div className="flex gap-2 justify-end mt-2">
-          <Button variant="outline" onClick={handleUndoMove}>
-            Desfazer Movimento
-            <IoIosReturnLeft className="text-2xl" />
-          </Button>
-        </div>
+      </div>
+      <div className="flex gap-2 mt-2 items-center justify-center">
+        <Button className="w-40" onClick={() => window.location.reload()}>
+          Reiniciar Partida
+        </Button>
+        <Button className="w-40" variant="outline" onClick={handleUndoMove}>
+          Desfazer Movimento
+        </Button>
       </div>
     </>
   )
