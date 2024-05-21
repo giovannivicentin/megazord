@@ -1,7 +1,7 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Chess, PieceSymbol } from 'chess.js'
 import { Button } from './ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -22,6 +22,14 @@ function ChessGame() {
   const [fen, setFen] = useState('start')
   const [errorMessage, setErrorMessage] = useState('')
   const [player, setPlayer] = useState('Brancas')
+  const [correctMoveSound, setCorrectMoveSound] = useState<
+    HTMLAudioElement | undefined
+  >()
+
+  useEffect(() => {
+    const audio = new Audio('/sounds/move-chess.mp3')
+    setCorrectMoveSound(audio)
+  }, [])
 
   useEffect(() => {
     try {
@@ -38,7 +46,7 @@ function ChessGame() {
   const handleMove = (move: {
     from: string
     to: string
-    promotion?: PieceSymbol | undefined
+    promotion?: PieceSymbol
   }) => {
     try {
       const result = game.move({
@@ -52,6 +60,7 @@ function ChessGame() {
       setFen(game.fen())
       setPlayer(player === 'Brancas' ? 'Pretas' : 'Brancas')
       setErrorMessage('')
+      correctMoveSound?.play()
     } catch (error) {
       setErrorMessage('Movimento inválido')
     }
