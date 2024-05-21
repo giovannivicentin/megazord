@@ -9,7 +9,7 @@ export default function Home() {
           The Woodie Flowers Box
         </h1>
         <p className="font-openSans text-sm md:text-base mx-4 md:mx-0 md:w-[55%] mt-1 text-muted-foreground">
-          Uma ferramenta eficiente inspirada em Woodie Flowers que introduz
+          Uma ferramenta eficiente inspirada no Woodie Flowers que introduz
           crianças aos conceitos básicos do STEAM com atividades práticas e
           divertidas.
         </p>

@@ -53,34 +53,18 @@ export function Navbar() {
 
   return (
     <nav>
-      <div className="flex justify-between items-center mx-4 md:mx-16">
+      <div className="flex justify-between items-center mx-4 md:mx-36 mb-1">
         <ul className="flex items-center">
           <li>
             <Link href="/">
               <div className="flex items-center">
                 <Image
-                  src="/megaHelmetWhite.png"
+                  src="/megaHelmetWhite.svg"
                   alt="Megazord Helmet Logo"
-                  width="72"
-                  height="58"
-                  className="mb-3 invert dark:invert-0"
+                  width="55"
+                  height="45"
+                  className="invert dark:invert-0"
                 />
-                <div className="hidden md:flex flex-col items-center">
-                  <Image
-                    src="/megazordWhite.png"
-                    alt="Megazord Phrase Logo"
-                    width="100"
-                    height="36"
-                    className="invert dark:invert-0"
-                  />
-                  <Image
-                    src="/hashBlack.png"
-                    alt="Megazord Phrase Logo"
-                    width="58"
-                    height="13"
-                    className="dark:invert"
-                  />
-                </div>
               </div>
             </Link>
           </li>
