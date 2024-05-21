@@ -24,7 +24,12 @@ function ChessGame() {
   const [player, setPlayer] = useState('Brancas')
 
   useEffect(() => {
-    setFen(game.fen())
+    try {
+      const initialFen = game.fen()
+      setFen(initialFen)
+    } catch (error) {
+      console.error('Failed to initialize game:', error)
+    }
   }, [game])
 
   const boardWidth =
@@ -61,9 +66,17 @@ function ChessGame() {
   return (
     <>
       <div className="flex items-center">
-        <p className="my-2 text-lg text-center font-semibold">
-          É a vez das {player}
-        </p>{' '}
+        <p
+          className={`my-2 text-lg text-center font-semibold text-gray-800 dark:text-white`}
+        >
+          É a vez das{' '}
+          <span
+            className={`font-bold ${player === 'Brancas' ? 'text-primary dark:text-white' : 'text-black dark:text-primary'} transition-colors duration-300`}
+          >
+            {player}
+          </span>
+        </p>
+
         {errorMessage && (
           <Alert
             className={cn(
