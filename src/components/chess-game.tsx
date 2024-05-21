@@ -1,4 +1,5 @@
 'use client'
+
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect } from 'react'
 import { Chess, PieceSymbol } from 'chess.js'
@@ -9,6 +10,11 @@ import { cn } from '@/lib/utils'
 
 const Chessboard = dynamic(() => import('chessboardjsx'), {
   ssr: false,
+  loading: () => (
+    <p className="animate-pulse animate-infinite animate-ease-linear flex items-center justify-center text-lg font-poppins">
+      Carregando...
+    </p>
+  ),
 })
 
 function ChessGame() {
@@ -55,11 +61,13 @@ function ChessGame() {
   return (
     <>
       <div className="flex items-center">
-        <p className="my-2 text-lg text-center">É a vez das {player}</p>{' '}
+        <p className="my-2 text-lg text-center font-semibold">
+          É a vez das {player}
+        </p>{' '}
         {errorMessage && (
           <Alert
             className={cn(
-              'fixed m-6 top-0 z-[100] flex w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col max-w-[210px] bg-secondary text-red-600',
+              'fixed m-6 top-0 z-[100] flex w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col max-w-[210px] bg-secondary dark:bg-background dark:text-red-600 dark:border-2 dark:border-red-600',
             )}
             variant="destructive"
           >
@@ -82,7 +90,7 @@ function ChessGame() {
           }
         />
       </div>
-      <div className="flex gap-2 mt-2 items-center justify-center">
+      <div className="flex gap-3 mt-3 items-center justify-center">
         <Button className="w-40" onClick={() => window.location.reload()}>
           Reiniciar Partida
         </Button>
