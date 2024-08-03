@@ -163,7 +163,7 @@ export default function WhiteboardCanvas() {
         </div>
         <div className="flex-grow" />
         <label htmlFor="lineWidthRange" className="mr-2">
-          Line Width:
+          Tamanho da Linha:
         </label>
         <input
           id="lineWidthRange"
@@ -175,18 +175,18 @@ export default function WhiteboardCanvas() {
           title="Line Width"
         />
       </div>
-      <div className="flex justify-center my-4">
+      <div className="flex gap-3 mt-3 items-center justify-center">
         <button
-          className="bg-blue-500 text-white px-4 py-2 mr-2 rounded-md"
+          className="bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2 mr-2 rounded-md"
           onClick={undoDrawing}
         >
-          Undo
+          Desfazer
         </button>
         <button
-          className="bg-red-500 text-white px-4 py-2 rounded-md"
+          className="bg-red-500 text-primary-foreground shadow hover:bg-red-500/90 px-4 py-2 mr-2 rounded-md"
           onClick={clearDrawing}
         >
-          Clear
+          Limpar
         </button>
       </div>
     </div>
