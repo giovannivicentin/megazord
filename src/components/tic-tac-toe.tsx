@@ -68,7 +68,7 @@ export function TicTacToeGame() {
 
   return (
     <div className="text-center">
-      <h1 className="mt-[3.125rem] mb-[3.125rem] text-[3.75rem] text-black dark:text-white flex justify-center items-center">
+      <h1 className="mt-12 mb-12 text-6xl text-black dark:text-white flex justify-center items-center">
         {winner ? (
           <>
             Vencedor:
@@ -83,11 +83,11 @@ export function TicTacToeGame() {
           'Tic Tac Toe Game'
         )}
       </h1>
-      <div className="h-[37.50rem] w-[35.25rem] flex m-auto flex-wrap">
+      <div className="h-1/2 w-5/12 flex m-auto flex-wrap justify-center">
         {data.map((value, index) => (
           <div
             key={index}
-            className="flex h-[11.25rem] w-[11.25rem] bg-[#1f3540] border-[0.25rem] border-[#0f1b21] border-solid rounded-[0.75rem] cursor-pointer justify-center items-center"
+            className="flex h-44 w-44 bg-brand-color-600 border-4 border-brand-color-700 border-solid rounded-md cursor-pointer justify-center items-center"
             onClick={() => toggle(index)}
           >
             {value === 'x' && (
@@ -110,10 +110,10 @@ export function TicTacToeGame() {
         ))}
       </div>
       <button
-        className="w-[15.63rem] h-[6.25rem] border-none outline-none cursor-pointer rounded-[3.13rem] bg-primary text-[1.63rem] mt-[1.56rem] mb-[3.13rem]"
+        className="w-64 h-24 border-none outline-none cursor-pointer rounded-3xl bg-primary text-2xl mt-6 mb-8 hover:bg-primary/90"
         onClick={reset}
       >
-        Reset
+        Reiniciar
       </button>
     </div>
   )
