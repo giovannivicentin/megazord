@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
+import { useState } from 'react'
 
 const initialData = ['', '', '', '', '', '', '', '', '']
 
@@ -61,18 +62,21 @@ export function TicTacToeGame() {
     setWinner(null)
   }
 
+  const { theme } = useTheme()
+
+  const isDarkMode = theme === 'dark'
+
   return (
     <div className="text-center">
-      <h1 className="mt-[3.125rem] mb-[3.125rem] text-[3.75rem] text-white flex justify-center items-center">
+      <h1 className="mt-[3.125rem] mb-[3.125rem] text-[3.75rem] text-black dark:text-white flex justify-center items-center">
         {winner ? (
           <>
             Vencedor:
             <Image
-              src={`/${winner === 'x' ? 'whiteX' : 'blueCircle'}.png`}
+              src={`/${winner === 'x' ? (isDarkMode ? 'whiteX' : 'blackX') : 'blueCircle'}.png`}
               alt={`${winner === 'x' ? 'Cross' : 'Circle'} Icon`}
               width={70}
               height={70}
-              className="ml-4"
             />
           </>
         ) : (
