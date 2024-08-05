@@ -29,6 +29,8 @@ const config = {
         'brand-color-300': '#010CC8',
         'brand-color-400': '#01008C',
         'brand-color-500': '#02016D',
+        'brand-color-600': '#1f3540',
+        'brand-color-700': '#0f1b21',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
