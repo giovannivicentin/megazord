@@ -1,5 +1,6 @@
 'use client'
 import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { Button } from './ui/button'
 
 interface DrawingAction {
   path: { x: number; y: number }[]
@@ -155,17 +156,17 @@ export default function WhiteboardCanvas() {
         onMouseMove={draw}
         onMouseUp={endDrawing}
         onMouseOut={endDrawing}
-        className="border rounded-sm border-gray-400 w-full"
+        className="border rounded-sm border-gray-400 dark:border-muted w-full aspect-video"
       />
-      <div className="flex my-4 gap-4 items-center">
+      <div className="flex my-4 gap-2 md:gap-4 justify-between items-center">
         <div className="flex justify-center space-x-4 border p-3 rounded-md bg-neutral-200 dark:bg-muted shadow-md">
           {['red', 'blue', 'yellow', 'green', 'orange', 'black', 'white'].map(
             (color) => (
               <div
                 key={color}
-                className={`w-8 h-8 rounded-full cursor-pointer ${
+                className={`md:w-8 md:h-8 w-4 h-4 rounded-full cursor-pointer ${
                   currentColor === color
-                    ? 'border-4 border-black dark:border-white'
+                    ? 'border-2 border-black dark:border-white'
                     : ''
                 }`}
                 style={{ backgroundColor: color }}
@@ -175,7 +176,7 @@ export default function WhiteboardCanvas() {
           )}
         </div>
         <div className="flex-grow" />
-        <label htmlFor="lineWidthRange" className="mr-2">
+        <label htmlFor="lineWidthRange" className="text-xs md:text-lg">
           Tamanho da Linha:
         </label>
         <input
@@ -188,19 +189,20 @@ export default function WhiteboardCanvas() {
           title="Line Width"
         />
       </div>
-      <div className="flex gap-3 mt-3 items-center justify-center">
-        <button
-          className="bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2 mr-2 rounded-md"
+      <div className="flex gap-3 items-center justify-center">
+        <Button
+          className="dark:text-white shadow-md w-40 h-10 md:h-16 md:w-60 md:text-lg"
           onClick={undoDrawing}
         >
           Desfazer
-        </button>
-        <button
-          className="bg-red-500 text-primary-foreground shadow hover:bg-red-500/90 px-4 py-2 mr-2 rounded-md"
+        </Button>
+        <Button
+          variant="destructive"
+          className="shadow-md w-40 h-10 md:h-16 md:w-60 md:text-lg"
           onClick={clearDrawing}
         >
           Limpar
-        </button>
+        </Button>
       </div>
     </div>
   )
