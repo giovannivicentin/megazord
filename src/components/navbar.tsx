@@ -1,13 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { ModeToggle } from './mode-toggle'
 import Link from 'next/link'
-import { Separator } from './ui/separator'
-import { Button } from './ui/button'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FiMenu, FiX } from 'react-icons/fi'
 import { items } from '../lib/items'
+import { ModeToggle } from './mode-toggle'
+import { Button } from './ui/button'
+import { Separator } from './ui/separator'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -53,7 +53,7 @@ export function Navbar() {
 
   return (
     <nav>
-      <div className="flex justify-between items-center mx-4 md:mx-36 mb-1">
+      <div className="flex justify-between items-center mx-4 md:mx-36 mb-1 py-2">
         <ul className="flex items-center">
           <li>
             <Link href="/">
@@ -61,8 +61,8 @@ export function Navbar() {
                 <Image
                   src="/megaHelmetWhite.svg"
                   alt="Megazord Helmet Logo"
-                  width="55"
-                  height="45"
+                  width="75"
+                  height="65"
                   className="invert dark:invert-0"
                 />
               </div>
