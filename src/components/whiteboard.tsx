@@ -1,5 +1,5 @@
 'use client'
-import { MouseEvent, useEffect, useRef, useState, useCallback } from 'react'
+import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
 
 interface DrawingAction {
   path: { x: number; y: number }[]
@@ -37,18 +37,29 @@ export default function WhiteboardCanvas() {
     },
     [drawingActions],
   )
-
   useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current
-      canvas.width = 900
-      canvas.height = 500
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        setContext(ctx)
-        reDrawPreviousData(ctx)
+    const handleResize = () => {
+      if (canvasRef.current) {
+        const canvas = canvasRef.current
+        const parentDiv = canvas.parentElement
+
+        if (parentDiv) {
+          canvas.width = parentDiv.offsetWidth
+          canvas.height = parentDiv.offsetWidth * (500 / 900)
+
+          const ctx = canvas.getContext('2d')
+          if (ctx) {
+            setContext(ctx)
+            reDrawPreviousData(ctx)
+          }
+        }
       }
     }
+
+    requestAnimationFrame(handleResize)
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [reDrawPreviousData])
 
   const startDrawing = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -137,23 +148,25 @@ export default function WhiteboardCanvas() {
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center max-w-md sm:max-w-xl md:max-w-3xl xl:max-w-4xl">
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={endDrawing}
         onMouseOut={endDrawing}
-        className="border border-gray-400"
+        className="border rounded-sm border-gray-400 w-full"
       />
-      <div className="flex my-4">
-        <div className="flex justify-center space-x-4">
+      <div className="flex my-4 gap-4 items-center">
+        <div className="flex justify-center space-x-4 border p-3 rounded-md bg-neutral-200 dark:bg-muted shadow-md">
           {['red', 'blue', 'yellow', 'green', 'orange', 'black', 'white'].map(
             (color) => (
               <div
                 key={color}
                 className={`w-8 h-8 rounded-full cursor-pointer ${
-                  currentColor === color ? 'border-4 border-black' : ''
+                  currentColor === color
+                    ? 'border-4 border-black dark:border-white'
+                    : ''
                 }`}
                 style={{ backgroundColor: color }}
                 onClick={() => changeColor(color)}
