@@ -1,11 +1,14 @@
 'use client'
 
-import React from 'react'
-
 export function PuzzleGame() {
   return (
     <div className="text-center">
-      <div>Quebra Cabeça</div>
+      <div>
+        <h2>
+          Tentativas: <span>0</span>
+        </h2>
+        <div></div>
+      </div>
     </div>
   )
 }
