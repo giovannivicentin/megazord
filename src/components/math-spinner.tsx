@@ -26,7 +26,7 @@ function SimpleMathSpinner() {
 
   return (
     <>
-      <div className="flex flex-row gap-10 mt-8 items-center">
+      <div className="flex flex-row gap-10 mt-12 items-center">
         <div className="w-full max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
           <div className="flex flex-col items-center gap-4">
             <h2 className="text-black font-bold text-2xl">Soma</h2>
@@ -36,6 +36,7 @@ function SimpleMathSpinner() {
                 placeholder="0"
                 value={number1}
                 onChange={handleInputChange(setNumber1)}
+                min={0}
                 className="w-full text-center text-xl p-2 border border-gray-300 rounded"
               />
               <span className="text-2xl text-blue-500">+</span>
@@ -44,6 +45,7 @@ function SimpleMathSpinner() {
                 placeholder="0"
                 value={number2}
                 onChange={handleInputChange(setNumber2)}
+                min={0}
                 className="w-full text-center text-xl p-2 border border-gray-300 rounded"
               />
             </div>
@@ -69,6 +71,7 @@ function SimpleMathSpinner() {
                 placeholder="0"
                 value={number3}
                 onChange={handleInputChange(setNumber3)}
+                min={0}
                 className="w-full text-center text-xl p-2 border border-gray-300 rounded"
               />
               <span className="text-2xl text-blue-500">-</span>
@@ -77,6 +80,7 @@ function SimpleMathSpinner() {
                 placeholder="0"
                 value={number4}
                 onChange={handleInputChange(setNumber4)}
+                min={0}
                 className="w-full text-center text-xl p-2 border border-gray-300 rounded"
               />
             </div>
