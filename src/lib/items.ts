@@ -10,16 +10,6 @@ export const items = [
     imageUrl: '/preview-pages/chess.png',
   },
   {
-    name: 'Circuito Elétrico',
-    pageToGo: '/electric-circuit',
-    imageUrl: '/preview-pages/chess.png',
-  },
-  {
-    name: 'Catapulta',
-    pageToGo: '/catapult',
-    imageUrl: '/preview-pages/chess.png',
-  },
-  {
     name: 'Quebra Cabeça',
     pageToGo: '/puzzle',
     imageUrl: '/preview-pages/puzzle.png',
