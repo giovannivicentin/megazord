@@ -1,26 +1,30 @@
-import Link from 'next/link'
 import { items } from '../lib/items'
+import { GameItem } from '../components/game-item'
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-evenly mx-4 md:mx-0">
-      <div className="flex flex-col items-center text-center">
-        <h1 className="font-poppins uppercase font-bold text-3xl md:text-5xl mt-12">
+    <main className="flex min-h-screen flex-col items-center justify-start py-8 px-4 md:px-8 lg:px-16">
+      <div className="w-full max-w-4xl mx-auto text-center mb-12">
+        <h1 className="font-poppins uppercase font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-primary">
           The Woodie Flowers Box
         </h1>
-        <p className="font-openSans text-sm md:text-base mx-4 md:mx-0 md:w-[55%] mt-1 text-muted-foreground">
+        <p className="font-openSans text-base md:text-lg mx-auto max-w-2xl text-muted-foreground">
           Uma ferramenta eficiente inspirada no Woodie Flowers que introduz
           crianças aos conceitos básicos do STEAM com atividades práticas e
           divertidas.
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-2 lg:gap-5 lg:grid-cols-5 mt-12 animate-fade-up animate-once duration-400">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-up animate-once duration-400">
         {items.map((item, index) => (
-          <Link href={item.pageToGo} key={index}>
-            <div className="bg-primary text-secondary rounded-sm p-10 lg:w-44 h-48 lg:h-64 flex items-center justify-center text-center">
-              {item.name}
-            </div>
-          </Link>
+          <GameItem
+            key={index}
+            name={item.name}
+            pageToGo={item.pageToGo}
+            imageUrl={
+              item.imageUrl ||
+              `/placeholder.svg?height=300&width=400&text=${encodeURIComponent(item.name)}`
+            }
+          />
         ))}
       </div>
     </main>

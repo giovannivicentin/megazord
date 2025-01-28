@@ -2,41 +2,41 @@ export const items = [
   {
     name: 'Elementos da Tabela Periódica',
     pageToGo: '/periodic-table',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Relógio de Sol',
     pageToGo: '/sundial',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Quebra Cabeça',
     pageToGo: '/puzzle',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/puzzle.png',
   },
   {
     name: 'Quadro Branco',
     pageToGo: '/whiteboard',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Xadrez',
     pageToGo: '/chess',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Damas',
     pageToGo: '/checkers',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Jogo da Velha',
     pageToGo: '/tic-tac-toe',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
   {
     name: 'Spinner de Matemática',
     pageToGo: '/math-spinner',
-    imageUrl: '/megaHelmetWhite.svg',
+    imageUrl: '/preview-pages/chess.png',
   },
 ]
