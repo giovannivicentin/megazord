@@ -198,13 +198,13 @@ export default function CalculadoraInfantil() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               onClick={handleVerify}
-              className="bg-primary hover:bg-primary/90 py-2 px-4 rounded text-sm sm:text-base"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
             >
               Verificar
             </Button>
             <Button
               onClick={handleReset}
-              className="bg-background text-black dark:text-white hover:bg-secondary/80 py-2 px-4 rounded text-sm sm:text-base"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background text-black dark:text-white shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-40"
             >
               Reiniciar
             </Button>
