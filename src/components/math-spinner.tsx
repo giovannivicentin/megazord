@@ -1,105 +1,216 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 
-function SimpleMathSpinner() {
-  const [number1, setNumber1] = useState<number>(0)
-  const [number2, setNumber2] = useState<number>(0)
-  const [number3, setNumber3] = useState<number>(0)
-  const [number4, setNumber4] = useState<number>(0)
-  const [totalSum, setTotalSum] = useState<number>(0)
-  const [totalSub, setTotalSub] = useState<number>(0)
+type Operator = '+' | '-' | '*' | '/'
 
-  const handleInputChange =
-    (setter: React.Dispatch<React.SetStateAction<number>>) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setter(Number(e.target.value))
+const EASY_OPERATORS: Operator[] = ['+', '-']
+const MEDIUM_OPERATORS: Operator[] = ['+', '-', '*']
+const HARD_OPERATORS: Operator[] = ['+', '-', '*', '/']
+
+interface Question {
+  num1: number
+  num2: number
+  operator: Operator
+  correctAnswer: number
+}
+
+function calculateAnswer(num1: number, num2: number, operator: Operator) {
+  switch (operator) {
+    case '+':
+      return num1 + num2
+    case '-':
+      return num1 - num2
+    case '*':
+      return num1 * num2
+    case '/':
+      return num1 / num2
+    default:
+      return 0
+  }
+}
+
+function generateQuestions(
+  operators: Operator[],
+  rangeMax: number,
+  totalQuestions: number,
+) {
+  const questions: Question[] = []
+  const usedCombinations = new Set<string>()
+
+  while (questions.length < totalQuestions) {
+    const operator = operators[Math.floor(Math.random() * operators.length)]
+    let num1 = Math.floor(Math.random() * rangeMax) + 1
+    let num2 = Math.floor(Math.random() * rangeMax) + 1
+
+    if (operator === '-' && num2 > num1) {
+      ;[num1, num2] = [num2, num1]
     }
 
-  const sumCalculate = () => {
-    setTotalSum(number1 + number2)
+    if (operator === '/') {
+      while (num1 % num2 !== 0) {
+        num1 = Math.floor(Math.random() * rangeMax) + 1
+        num2 = Math.floor(Math.random() * rangeMax) + 1
+      }
+    }
+
+    const combo = `${num1}-${operator}-${num2}`
+    if (!usedCombinations.has(combo)) {
+      usedCombinations.add(combo)
+      questions.push({
+        num1,
+        num2,
+        operator,
+        correctAnswer: calculateAnswer(num1, num2, operator),
+      })
+    }
   }
 
-  const subCalculate = () => {
-    setTotalSub(number3 - number4)
+  return questions
+}
+
+export default function CalculadoraInfantil() {
+  const [level, setLevel] = useState<'fácil' | 'médio' | 'difícil' | null>(null)
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [userAnswers, setUserAnswers] = useState<string[]>([])
+  const [results, setResults] = useState<(boolean | null)[]>([])
+
+  const handleSelectLevel = (selectedLevel: 'fácil' | 'médio' | 'difícil') => {
+    setLevel(selectedLevel)
+    let operators: Operator[] = []
+    let rangeMax = 10
+    let totalQuestions = 6
+    switch (selectedLevel) {
+      case 'fácil':
+        operators = EASY_OPERATORS
+        rangeMax = 10
+        totalQuestions = 6
+        break
+      case 'médio':
+        operators = MEDIUM_OPERATORS
+        rangeMax = 20
+        totalQuestions = 8
+        break
+      case 'difícil':
+        operators = HARD_OPERATORS
+        rangeMax = 25
+        totalQuestions = 8
+        break
+    }
+    const generated = generateQuestions(operators, rangeMax, totalQuestions)
+    setQuestions(generated)
+    setUserAnswers(Array(totalQuestions).fill(''))
+    setResults(Array(totalQuestions).fill(null))
+  }
+
+  const handleChangeAnswer = (index: number, value: string) => {
+    const newAnswers = [...userAnswers]
+    newAnswers[index] = value
+    setUserAnswers(newAnswers)
+  }
+
+  const handleVerify = () => {
+    const newResults = questions.map((q, i) => {
+      const userValue = Number.parseFloat(userAnswers[i])
+      return userValue === q.correctAnswer
+    })
+    setResults(newResults)
+  }
+
+  const handleReset = () => {
+    if (level) {
+      handleSelectLevel(level)
+    }
   }
 
   return (
-    <>
-      <div className="flex flex-row gap-10 mt-12 items-center">
-        <div className="w-full max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-black font-bold text-2xl">Soma</h2>
-            <div className="flex items-center gap-2 w-full">
-              <input
-                type="number"
-                placeholder="0"
-                value={number1}
-                onChange={handleInputChange(setNumber1)}
-                min={0}
-                className="w-full text-center text-xl p-2 border border-gray-300 rounded"
-              />
-              <span className="text-2xl text-blue-500">+</span>
-              <input
-                type="number"
-                placeholder="0"
-                value={number2}
-                onChange={handleInputChange(setNumber2)}
-                min={0}
-                className="w-full text-center text-xl p-2 border border-gray-300 rounded"
-              />
-            </div>
-            <button
-              onClick={sumCalculate}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white text-xl font-bold py-2 px-4 rounded transition duration-200"
-            >
-              Calcular
-            </button>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-black">
-                O resultado da soma é {totalSum}
-              </h2>
-            </div>
-          </div>
-        </div>
-        <div className="w-full max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-black font-bold text-2xl">Subtração</h2>
-            <div className="flex items-center gap-2 w-full">
-              <input
-                type="number"
-                placeholder="0"
-                value={number3}
-                onChange={handleInputChange(setNumber3)}
-                min={0}
-                className="w-full text-center text-xl p-2 border border-gray-300 rounded"
-              />
-              <span className="text-2xl text-blue-500">-</span>
-              <input
-                type="number"
-                placeholder="0"
-                value={number4}
-                onChange={handleInputChange(setNumber4)}
-                min={0}
-                className="w-full text-center text-xl p-2 border border-gray-300 rounded"
-              />
-            </div>
-            <button
-              onClick={subCalculate}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white text-xl font-bold py-2 px-4 rounded transition duration-200"
-            >
-              Calcular
-            </button>
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-black">
-                O resultado da subtração é {totalSub}
-              </h2>
-            </div>
-          </div>
+    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6 bg-white shadow rounded-md text-black">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center">
+        Jogo de Cálculo
+      </h1>
+
+      <div className="text-center space-y-4">
+        <h2 className="text-lg sm:text-xl font-semibold">
+          Selecione um nível de dificuldade:
+        </h2>
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+          <Button
+            onClick={() => handleSelectLevel('fácil')}
+            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm sm:text-base"
+          >
+            Fácil
+          </Button>
+          <Button
+            onClick={() => handleSelectLevel('médio')}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded text-sm sm:text-base"
+          >
+            Médio
+          </Button>
+          <Button
+            onClick={() => handleSelectLevel('difícil')}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded text-sm sm:text-base"
+          >
+            Difícil
+          </Button>
         </div>
       </div>
-    </>
+
+      {level && (
+        <div className="space-y-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-center">
+            Nível: {level.toUpperCase()}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {questions.map((question, index) => (
+              <div
+                key={index}
+                className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2"
+              >
+                <label
+                  htmlFor={`question-${index}`}
+                  className="text-base sm:text-lg font-semibold whitespace-nowrap"
+                >
+                  {question.num1} {question.operator} {question.num2} =
+                </label>
+                <div className="flex items-center space-x-2 w-full">
+                  <input
+                    id={`question-${index}`}
+                    type="number"
+                    placeholder="Resposta"
+                    value={userAnswers[index]}
+                    onChange={(e) => handleChangeAnswer(index, e.target.value)}
+                    className="no-spinner border p-2 rounded w-full bg-white text-sm sm:text-base"
+                    min={0}
+                    step="1"
+                  />
+                  {results[index] !== null && (
+                    <span
+                      className={`text-lg ${results[index] ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {results[index] ? '✓' : '✗'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button
+              onClick={handleVerify}
+              className="bg-primary hover:bg-primary/90 py-2 px-4 rounded text-sm sm:text-base"
+            >
+              Verificar
+            </Button>
+            <Button
+              onClick={handleReset}
+              className="bg-background text-black dark:text-white hover:bg-secondary/80 py-2 px-4 rounded text-sm sm:text-base"
+            >
+              Reiniciar
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
-
-export default SimpleMathSpinner
