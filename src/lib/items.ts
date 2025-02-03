@@ -2,7 +2,7 @@ export const items = [
   {
     name: 'Elementos da Tabela Periódica',
     pageToGo: '/periodic-table',
-    imageUrl: '/preview-pages/chess.png',
+    imageUrl: '/preview-pages/memory-game.png',
   },
   {
     name: 'Quebra Cabeça',
