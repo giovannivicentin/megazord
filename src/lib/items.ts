@@ -5,11 +5,6 @@ export const items = [
     imageUrl: '/preview-pages/chess.png',
   },
   {
-    name: 'Relógio de Sol',
-    pageToGo: '/sundial',
-    imageUrl: '/preview-pages/chess.png',
-  },
-  {
     name: 'Quebra Cabeça',
     pageToGo: '/puzzle',
     imageUrl: '/preview-pages/puzzle.png',
@@ -17,7 +12,7 @@ export const items = [
   {
     name: 'Quadro Branco',
     pageToGo: '/whiteboard',
-    imageUrl: '/preview-pages/chess.png',
+    imageUrl: '/preview-pages/whiteboard.png',
   },
   {
     name: 'Xadrez',
@@ -27,16 +22,16 @@ export const items = [
   {
     name: 'Damas',
     pageToGo: '/checkers',
-    imageUrl: '/preview-pages/chess.png',
+    imageUrl: '/preview-pages/checkers.png',
   },
   {
     name: 'Jogo da Velha',
     pageToGo: '/tic-tac-toe',
-    imageUrl: '/preview-pages/chess.png',
+    imageUrl: '/preview-pages/tic-tac-toe.png',
   },
   {
     name: 'Spinner de Matemática',
     pageToGo: '/math-spinner',
-    imageUrl: '/preview-pages/chess.png',
+    imageUrl: '/preview-pages/math.png',
   },
 ]

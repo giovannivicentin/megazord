@@ -61,19 +61,50 @@ export function CheckersGame() {
 
     const isKing = piece.includes('king')
     const direction = piece.includes('vermelhas') ? -1 : 1
-    const isSimpleMove =
-      (toRow === fromRow + direction ||
-        (isKing && toRow === fromRow - direction)) &&
-      Math.abs(toCol - fromCol) === 1
 
-    const isCaptureMove =
-      (toRow === fromRow + 2 * direction ||
-        (isKing && toRow === fromRow - 2 * direction)) &&
-      Math.abs(toCol - fromCol) === 2 &&
-      !!board[(fromRow + toRow) / 2][(fromCol + toCol) / 2] &&
-      !board[(fromRow + toRow) / 2][(fromCol + toCol) / 2]?.includes(turn)
+    if (isKing) {
+      const rowDiff = toRow - fromRow
+      const colDiff = toCol - fromCol
+      if (Math.abs(rowDiff) !== Math.abs(colDiff)) return false
 
-    return isSimpleMove || isCaptureMove
+      const rowStep = rowDiff > 0 ? 1 : -1
+      const colStep = colDiff > 0 ? 1 : -1
+
+      let currentRow = fromRow + rowStep
+      let currentCol = fromCol + colStep
+      let encounteredPiece = false
+
+      while (currentRow !== toRow && currentCol !== toCol) {
+        if (
+          currentRow < 0 ||
+          currentRow >= BOARD_SIZE ||
+          currentCol < 0 ||
+          currentCol >= BOARD_SIZE
+        ) {
+          return false
+        }
+
+        if (board[currentRow][currentCol] !== null) {
+          if (encounteredPiece) return false
+          encounteredPiece = true
+        }
+        currentRow += rowStep
+        currentCol += colStep
+      }
+
+      return true
+    } else {
+      const isSimpleMove =
+        toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1
+
+      const isCaptureMove =
+        toRow === fromRow + 2 * direction &&
+        Math.abs(toCol - fromCol) === 2 &&
+        !!board[(fromRow + toRow) / 2]?.[(fromCol + toCol) / 2] &&
+        !board[(fromRow + toRow) / 2]?.[(fromCol + toCol) / 2]?.includes(turn)
+
+      return isSimpleMove || isCaptureMove
+    }
   }
 
   const movePiece = (
@@ -92,8 +123,29 @@ export function CheckersGame() {
     newBoard[toRow][toCol] = piece
     newBoard[fromRow][fromCol] = null
 
-    if (Math.abs(toRow - fromRow) === 2) {
-      newBoard[(fromRow + toRow) / 2][(fromCol + toCol) / 2] = null
+    const rowDiff = Math.abs(toRow - fromRow)
+    const colDiff = Math.abs(toCol - fromCol)
+    if (rowDiff > 1 && colDiff > 1) {
+      const rowStep = (toRow - fromRow) / rowDiff
+      const colStep = (toCol - fromCol) / colDiff
+
+      let currentRow = fromRow + rowStep
+      let currentCol = fromCol + colStep
+
+      while (currentRow !== toRow && currentCol !== toCol) {
+        if (
+          currentRow >= 0 &&
+          currentRow < BOARD_SIZE &&
+          currentCol >= 0 &&
+          currentCol < BOARD_SIZE &&
+          board[currentRow][currentCol] !== null
+        ) {
+          newBoard[currentRow][currentCol] = null
+          break
+        }
+        currentRow += rowStep
+        currentCol += colStep
+      }
     }
 
     setBoard(newBoard)
@@ -156,11 +208,19 @@ export function CheckersGame() {
               onClick={() => handleCellClick(rowIndex, colIndex)}
               className={`w-16 h-16 flex items-center justify-center ${
                 (rowIndex + colIndex) % 2 === 0 ? 'bg-gray-300' : 'bg-gray-700'
-              } ${selectedPiece && selectedPiece.row === rowIndex && selectedPiece.col === colIndex ? 'border-4 border-yellow-500' : ''}`}
+              } ${
+                selectedPiece &&
+                selectedPiece.row === rowIndex &&
+                selectedPiece.col === colIndex
+                  ? 'border-4 border-yellow-500'
+                  : ''
+              }`}
             >
               {cell && (
                 <div
-                  className={`w-12 h-12 rounded-full ${cell.includes('vermelhas') ? 'bg-red-500' : 'bg-black'} ${cell.includes('king') ? 'border-4 border-gold' : ''}`}
+                  className={`w-12 h-12 rounded-full ${
+                    cell.includes('vermelhas') ? 'bg-red-500' : 'bg-black'
+                  } ${cell.includes('king') ? 'border-4 border-gold' : ''}`}
                 ></div>
               )}
             </div>
