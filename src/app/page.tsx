@@ -8,13 +8,13 @@ export default function Home() {
         <h1 className="font-poppins uppercase font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-primary">
           The Woodie Flowers Box
         </h1>
-        <p className="font-openSans text-base md:text-lg mx-auto max-w-2xl text-muted-foreground">
+        <p className="font-openSans text-base md:text-lg mx-auto max-w-2xl text-black/75 dark:text-white/75">
           Uma ferramenta eficiente inspirada no Woodie Flowers que introduz
           crianças aos conceitos básicos do STEAM com atividades práticas e
           divertidas.
         </p>
       </div>
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-up animate-once duration-400">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-up animate-once duration-400">
         {items.map((item, index) => (
           <GameItem
             key={index}
