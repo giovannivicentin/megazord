@@ -14,7 +14,7 @@ export default function Home() {
           divertidas.
         </p>
       </div>
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-up animate-once duration-400">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-up animate-once duration-400">
         {items.map((item, index) => (
           <GameItem
             key={index}
