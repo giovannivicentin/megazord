@@ -8,7 +8,7 @@ export default function Home() {
         <h1 className="font-poppins uppercase font-bold text-3xl md:text-4xl lg:text-5xl mb-4 text-primary">
           The Woodie Flowers Box
         </h1>
-        <p className="font-openSans text-base md:text-lg mx-auto max-w-2xl text-muted-foreground">
+        <p className="font-openSans text-base md:text-lg mx-auto max-w-2xl text-black/75 dark:text-white/75">
           Uma ferramenta eficiente inspirada no Woodie Flowers que introduz
           crianças aos conceitos básicos do STEAM com atividades práticas e
           divertidas.
