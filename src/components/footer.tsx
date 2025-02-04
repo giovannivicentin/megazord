@@ -2,6 +2,8 @@ import { FaInstagram, FaTiktok, FaYoutube } from 'react-icons/fa'
 import { Separator } from './ui/separator'
 
 export function Footer() {
+  const currentYear = new Date().getFullYear()
+
   return (
     <footer className="mt-8 dark:text-white">
       <Separator />
@@ -103,7 +105,7 @@ export function Footer() {
         </div>
         <div className="mt-8 text-center max-md:order-4">
           <p className="text-xs">
-            © Megazord7563 - 2025. Todos os direitos reservados.
+            © Megazord7563 - {currentYear}. Todos os direitos reservados.
           </p>
         </div>
       </div>
