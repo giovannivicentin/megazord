@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
+import { InfoButton } from './informative-button'
 
 type Operator = '+' | '-' | '*' | '/'
 
@@ -211,6 +212,7 @@ export default function CalculadoraInfantil() {
           </div>
         </div>
       )}
+      <InfoButton gameName="Spinner de Matemática" />
     </div>
   )
 }

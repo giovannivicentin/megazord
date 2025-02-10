@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { InfoButton } from '@/components/informative-button'
 
 const generateDeck = () => {
   const memoryCards = [
@@ -85,6 +86,7 @@ export default function PeriodicTable() {
       >
         Reiniciar
       </button>
+      <InfoButton gameName="Elementos da Tabela Periódica" />
     </div>
   )
 }

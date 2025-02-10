@@ -1,6 +1,7 @@
 'use client'
 import { shuffle } from 'lodash'
 import { useEffect, useState } from 'react'
+import { InfoButton } from '@/components/informative-button'
 
 interface PuzzlePiece {
   id: number
@@ -201,6 +202,7 @@ export function PuzzleGame() {
           Desfazer Movimento
         </button>
       </div>
+      <InfoButton gameName="Quebra Cabeça" />
     </div>
   )
 }
