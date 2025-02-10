@@ -192,7 +192,7 @@ const WhiteboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neutral-50">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neutral-50 dark:bg-[unset]">
       <h1 className="text-3xl font-bold mb-6">Quadro Branco</h1>
 
       <div
@@ -213,12 +213,14 @@ const WhiteboardPage: React.FC = () => {
       </div>
 
       <div className="p-4 bg-background border-muted-foreground rounded-lg shadow-lg w-full max-w-3xl">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4 place-items-center">
           {colors.map((c) => (
             <Button
               key={c.value}
               onClick={() => setColor(c.value)}
-              className={`w-8 h-8 rounded-full ${color === c.value ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                color === c.value ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+              }`}
               style={{ backgroundColor: c.value }}
               title={c.name}
             >
@@ -226,44 +228,44 @@ const WhiteboardPage: React.FC = () => {
             </Button>
           ))}
         </div>
-        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
-          <span className="text-sm font-medium text-gray-700">Line Width:</span>
-          <Slider
-            value={[lineWidth]}
-            onValueChange={(value) => setLineWidth(value[0])}
-            max={20}
-            step={1}
-            className="w-full sm:w-48"
-          />
-          <span className="text-sm font-medium text-gray-700">
-            {lineWidth}px
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={undo}
-            variant="outline"
-            className="flex items-center"
-          >
-            <Undo className="h-4 w-4 mr-2" />
-            Undo
-          </Button>
-          <Button
-            onClick={eraseAll}
-            variant="outline"
-            className="flex items-center"
-          >
-            <Eraser className="h-4 w-4 mr-2" />
-            Erase All
-          </Button>
-          <Button
-            onClick={downloadCanvas}
-            variant="outline"
-            className="flex items-center"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Download
-          </Button>
+        <div className="sm:flex flex-row-reverse items-center justify-between block">
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 pt-4">
+            <span className="text-sm font-medium ">Line Width:</span>
+            <Slider
+              value={[lineWidth]}
+              onValueChange={(value) => setLineWidth(value[0])}
+              max={20}
+              step={1}
+              className="w-full sm:w-48"
+            />
+            <span className="text-sm font-medium">{lineWidth}px</span>
+          </div>
+          <div className="flex flex-wrap gap-2 items-center justify-center sm:justify-normal">
+            <Button
+              onClick={undo}
+              variant="outline"
+              className="flex items-center"
+            >
+              <Undo className="h-4 w-4 mr-2" />
+              Undo
+            </Button>
+            <Button
+              onClick={eraseAll}
+              variant="outline"
+              className="flex items-center"
+            >
+              <Eraser className="h-4 w-4 mr-2" />
+              Erase All
+            </Button>
+            <Button
+              onClick={downloadCanvas}
+              variant="outline"
+              className="flex items-center"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+          </div>
         </div>
       </div>
 
