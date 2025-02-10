@@ -1,209 +1,270 @@
 'use client'
-import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
-import { Button } from './ui/button'
+import type React from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { Button } from '@/components/ui/button'
+import { Slider } from '@/components/ui/slider'
+import { Palette, Undo, Eraser, Download } from 'lucide-react'
 
-interface DrawingAction {
-  path: { x: number; y: number }[]
-  style: {
-    color: string
-    lineWidth: number
-  }
+interface Point {
+  x: number
+  y: number
 }
 
-export default function WhiteboardCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
-  const [drawing, setDrawing] = useState(false)
-  const [currentColor, setCurrentColor] = useState('black')
-  const [lineWidth, setLineWidth] = useState(3)
-  const [drawingActions, setDrawingActions] = useState<DrawingAction[]>([])
-  const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([])
-  const [currentStyle, setCurrentStyle] = useState({
-    color: 'black',
-    lineWidth: 3,
+interface DrawingAction {
+  points: Point[]
+  color: string
+  lineWidth: number
+}
+
+const colors = [
+  { name: 'Foreground', value: 'hsl(var(--foreground))' },
+  { name: 'Background', value: 'hsl(var(--background))' },
+  { name: 'Primary', value: 'hsl(var(--primary))' },
+  { name: 'Secondary', value: 'hsl(var(--secondary))' },
+  { name: 'Accent', value: 'hsl(var(--accent))' },
+  { name: 'Muted', value: 'hsl(var(--muted))' },
+  { name: 'Popover', value: 'hsl(var(--popover))' },
+  { name: 'Card', value: 'hsl(var(--card))' },
+  { name: 'Destructive', value: 'hsl(var(--destructive))' },
+]
+
+const Whiteboard: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [lastPoint, setLastPoint] = useState<Point>({ x: 0, y: 0 })
+  const [color, setColor] = useState<string>('hsl(var(--foreground))')
+  const [lineWidth, setLineWidth] = useState<number>(4)
+  const [drawingHistory, setDrawingHistory] = useState<DrawingAction[]>([])
+  const [currentAction, setCurrentAction] = useState<DrawingAction>({
+    points: [],
+    color: 'hsl(var(--foreground))',
+    lineWidth: 4,
   })
 
-  const reDrawPreviousData = useCallback(
-    (ctx: CanvasRenderingContext2D) => {
-      drawingActions.forEach(({ path, style }) => {
+  const redrawCanvas = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawingHistory.forEach((action) => {
+      if (action.points.length > 0) {
+        ctx.strokeStyle = action.color
+        ctx.lineWidth = action.lineWidth
         ctx.beginPath()
-        ctx.strokeStyle = style.color
-        ctx.lineWidth = style.lineWidth
-        ctx.moveTo(path[0].x, path[0].y)
-        path.forEach((point) => {
+        ctx.moveTo(action.points[0].x, action.points[0].y)
+        action.points.forEach((point) => {
           ctx.lineTo(point.x, point.y)
         })
         ctx.stroke()
-      })
-    },
-    [drawingActions],
-  )
+      }
+    })
+  }, [drawingHistory])
+
   useEffect(() => {
-    const handleResize = () => {
-      if (canvasRef.current) {
-        const canvas = canvasRef.current
-        const parentDiv = canvas.parentElement
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current
+      const container = containerRef.current
+      if (!canvas || !container) return
 
-        if (parentDiv) {
-          canvas.width = parentDiv.offsetWidth
-          canvas.height = parentDiv.offsetWidth * (500 / 900)
+      canvas.width = container.clientWidth
+      canvas.height = container.clientHeight
+      redrawCanvas()
+    }
 
-          const ctx = canvas.getContext('2d')
-          if (ctx) {
-            setContext(ctx)
-            reDrawPreviousData(ctx)
-          }
-        }
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [redrawCanvas])
+
+  const getPointerPosition = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      return { offsetX: 0, offsetY: 0 }
+    }
+
+    const rect = canvas.getBoundingClientRect()
+    if ('touches' in e && e.touches.length > 0) {
+      const touch = e.touches[0]
+      return {
+        offsetX: touch.clientX - rect.left,
+        offsetY: touch.clientY - rect.top,
       }
     }
 
-    requestAnimationFrame(handleResize)
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [reDrawPreviousData])
-
-  const startDrawing = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (context) {
-      context.beginPath()
-      context.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
-      setDrawing(true)
+    const mouseEvent = e as React.MouseEvent<HTMLCanvasElement>
+    return {
+      offsetX: mouseEvent.clientX - rect.left,
+      offsetY: mouseEvent.clientY - rect.top,
     }
   }
 
-  const draw = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!drawing || !context) return
-
-    context.strokeStyle = currentStyle.color
-    context.lineWidth = currentStyle.lineWidth
-    context.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
-    context.stroke()
-    setCurrentPath((prevPath) => [
-      ...prevPath,
-      { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY },
-    ])
+  const startDrawing = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const { offsetX, offsetY } = getPointerPosition(e)
+    setIsDrawing(true)
+    setLastPoint({ x: offsetX, y: offsetY })
+    setCurrentAction({ points: [{ x: offsetX, y: offsetY }], color, lineWidth })
   }
 
-  const endDrawing = () => {
-    if (context) {
-      setDrawing(false)
-      context.closePath()
-      if (currentPath.length > 0) {
-        setDrawingActions((prevActions) => [
-          ...prevActions,
-          { path: currentPath, style: currentStyle },
-        ])
-      }
-      setCurrentPath([])
+  const draw = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    if (!isDrawing) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const { offsetX, offsetY } = getPointerPosition(e)
+
+    ctx.strokeStyle = color
+    ctx.lineWidth = lineWidth
+    ctx.beginPath()
+    ctx.moveTo(lastPoint.x, lastPoint.y)
+    ctx.lineTo(offsetX, offsetY)
+    ctx.stroke()
+
+    setLastPoint({ x: offsetX, y: offsetY })
+    setCurrentAction((prev) => ({
+      ...prev,
+      points: [...prev.points, { x: offsetX, y: offsetY }],
+    }))
+  }
+
+  const stopDrawing = () => {
+    setIsDrawing(false)
+    if (currentAction.points.length > 0) {
+      setDrawingHistory((prev) => [...prev, currentAction])
     }
+    setCurrentAction({ points: [], color, lineWidth })
   }
 
-  const changeColor = (color: string) => {
-    setCurrentColor(color)
-    setCurrentStyle((prevStyle) => ({ ...prevStyle, color }))
+  const undo = () => {
+    if (drawingHistory.length === 0) return
+
+    setDrawingHistory((prev) => {
+      const newHistory = prev.slice(0, -1)
+      return newHistory
+    })
+
+    redrawCanvas()
   }
 
-  const changeWidth = (width: number) => {
-    setLineWidth(width)
-    setCurrentStyle((prevStyle) => ({ ...prevStyle, lineWidth: width }))
+  const eraseAll = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    setDrawingHistory([])
   }
 
-  const undoDrawing = () => {
-    if (drawingActions.length > 0) {
-      const newActions = drawingActions.slice(0, -1)
-      setDrawingActions(newActions)
-      const newContext = canvasRef.current?.getContext('2d')
-      if (newContext) {
-        newContext.clearRect(
-          0,
-          0,
-          canvasRef.current!.width,
-          canvasRef.current!.height,
-        )
-        newActions.forEach(({ path, style }) => {
-          newContext.beginPath()
-          newContext.strokeStyle = style.color
-          newContext.lineWidth = style.lineWidth
-          newContext.moveTo(path[0].x, path[0].y)
-          path.forEach((point) => {
-            newContext.lineTo(point.x, point.y)
-          })
-          newContext.stroke()
-        })
-      }
-    }
-  }
+  const downloadCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-  const clearDrawing = () => {
-    setDrawingActions([])
-    setCurrentPath([])
-    const newContext = canvasRef.current?.getContext('2d')
-    if (newContext) {
-      newContext.clearRect(
-        0,
-        0,
-        canvasRef.current!.width,
-        canvasRef.current!.height,
-      )
-    }
+    const dataURL = canvas.toDataURL('image/png')
+    const link = document.createElement('a')
+    link.download = 'whiteboard.png'
+    link.href = dataURL
+    link.click()
   }
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-md sm:max-w-xl md:max-w-3xl xl:max-w-4xl">
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={endDrawing}
-        onMouseOut={endDrawing}
-        className="border rounded-sm border-gray-400 dark:border-muted w-full aspect-video"
-      />
-      <div className="flex my-4 gap-2 md:gap-4 justify-between items-center">
-        <div className="flex justify-center space-x-4 border p-3 rounded-md bg-neutral-200 dark:bg-muted shadow-md">
-          {['red', 'blue', 'yellow', 'green', 'orange', 'black', 'white'].map(
-            (color) => (
-              <div
-                key={color}
-                className={`md:w-8 md:h-8 w-4 h-4 rounded-full cursor-pointer ${
-                  currentColor === color
-                    ? 'border-2 border-black dark:border-white'
-                    : ''
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => changeColor(color)}
-              />
-            ),
-          )}
+    <div className="flex flex-col w-full h-full max-w-5xl mx-auto p-4">
+      <div className="mb-4 p-4 bg-background border border-border rounded-lg shadow-md w-full">
+        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mb-4">
+          {colors.map((c) => (
+            <Button
+              key={c.value}
+              onClick={() => setColor(c.value)}
+              variant={color === c.value ? 'default' : 'outline'}
+              className={`w-8 h-8 rounded-full p-0 ${color === c.value ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+              style={{ backgroundColor: c.value }}
+              title={c.name}
+            >
+              {color === c.value && (
+                <Palette className="h-4 w-4 text-primary-foreground" />
+              )}
+            </Button>
+          ))}
         </div>
-        <div className="flex-grow" />
-        <label htmlFor="lineWidthRange" className="text-xs md:text-lg">
-          Tamanho da Linha:
-        </label>
-        <input
-          id="lineWidthRange"
-          type="range"
-          min="1"
-          max="10"
-          value={lineWidth}
-          onChange={(e) => changeWidth(parseInt(e.target.value))}
-          title="Line Width"
-        />
+        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
+          <span className="text-sm font-medium text-foreground">
+            Line Width:
+          </span>
+          <Slider
+            value={[lineWidth]}
+            onValueChange={(value) => setLineWidth(value[0])}
+            max={20}
+            step={1}
+            className="w-full sm:w-48"
+          />
+          <span className="text-sm font-medium text-foreground">
+            {lineWidth}px
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={undo}
+            variant="outline"
+            className="flex items-center"
+          >
+            <Undo className="h-4 w-4 mr-2" />
+            Undo
+          </Button>
+          <Button
+            onClick={eraseAll}
+            variant="outline"
+            className="flex items-center"
+          >
+            <Eraser className="h-4 w-4 mr-2" />
+            Erase All
+          </Button>
+          <Button
+            onClick={downloadCanvas}
+            variant="outline"
+            className="flex items-center"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download
+          </Button>
+        </div>
       </div>
-      <div className="flex gap-3 items-center justify-center">
-        <Button
-          className="dark:text-white shadow-md w-40 h-10 md:h-16 md:w-60 md:text-lg"
-          onClick={undoDrawing}
-        >
-          Desfazer
-        </Button>
-        <Button
-          variant="destructive"
-          className="shadow-md w-40 h-10 md:h-16 md:w-60 md:text-lg"
-          onClick={clearDrawing}
-        >
-          Limpar
-        </Button>
+
+      <div ref={containerRef} className="flex-grow w-full relative">
+        <canvas
+          ref={canvasRef}
+          className="bg-background border border-border rounded-lg shadow-lg absolute inset-0 w-full h-full"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
       </div>
     </div>
   )
 }
+
+export default Whiteboard
