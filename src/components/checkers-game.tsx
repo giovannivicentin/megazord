@@ -167,8 +167,8 @@ export function CheckersGame() {
   const winner = checkWinner()
 
   return (
-    <div className="flex flex-col items-center mt-16 min-h-screen bg-transparent">
-      <h1 className="text-gray-900 dark:text-white text-3xl font-bold mb-4">
+    <div className="min-h-screen flex flex-col items-center pt-8 px-4">
+      <h1 className="text-gray-900 dark:text-white text-3xl font-bold mb-8">
         Jogo de Damas
       </h1>
       <div className="flex items-center">

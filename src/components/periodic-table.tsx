@@ -57,7 +57,7 @@ export default function PeriodicTable() {
 
   return (
     <div className="text-center">
-      <h1 className="text-3xl mt-12 mb-12">Elementos da Tabela Periódica</h1>
+      <h1 className="text-3xl font-bold mb-8">Elementos da Tabela Periódica</h1>
       {gameOver && <h2 className="p-5 text-3xl">Você Venceu!</h2>}
       <div className="grid grid-cols-4 gap-5 mt-5">
         {cards.map((card, index) => (

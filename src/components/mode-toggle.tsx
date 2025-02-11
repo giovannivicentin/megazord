@@ -1,40 +1,69 @@
 'use client'
 
-import * as React from 'react'
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons'
+import { Loader, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Button } from './ui/button'
 
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleToggle = () => {
+    if (resolvedTheme === 'dark') {
+      setTheme('light')
+    } else {
+      setTheme('dark')
+    }
+  }
+
+  const displayIcon = () => {
+    if (!mounted) {
+      return (
+        <Loader className="h-6 w-6 animate-spin md:h-5 md:w-5 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7" />
+      )
+    }
+
+    if (theme === 'system') {
+      return resolvedTheme === 'dark' ? (
+        <>
+          <Sun className="h-6 w-6 text-primary dark:text-white md:h-5 md:w-5 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7" />
+          <span className="sr-only">Sun Icon</span>
+        </>
+      ) : (
+        <>
+          <Moon className="h-6 w-6 text-primary dark:text-white md:h-5 md:w-5 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7" />
+          <span className="sr-only">Moon Icon</span>
+        </>
+      )
+    }
+    return theme === 'dark' ? (
+      <>
+        <Sun className="h-6 w-6 text-primary dark:text-white md:h-5 md:w-5 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7" />
+        <span className="sr-only">Sun Icon</span>
+      </>
+    ) : (
+      <>
+        <Moon className="h-6 w-6 text-primary dark:text-white md:h-5 md:w-5 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7" />
+        <span className="sr-only">Moon Icon</span>
+      </>
+    )
+  }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      aria-label="Button to change theme"
+      size="icon"
+      className="hover:text-muted-foreground"
+      onClick={handleToggle}
+    >
+      {displayIcon()}
+    </Button>
   )
 }
