@@ -1,120 +1,113 @@
 'use client'
 
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
-import { useState } from 'react'
+import { calculateWinner, getAIMove } from '@/utils/game-logic'
+import { useState, useEffect, useCallback } from 'react'
+import { Board } from './board'
+import { GameModeSelection } from './game-mode-selection'
+import { TypewriterText } from './type-writter-text'
+import { WinningLine } from './winning-line'
 
-const initialData = ['', '', '', '', '', '', '', '', '']
+export default function TicTacToe() {
+  const [board, setBoard] = useState(Array(9).fill(null))
+  const [isXNext, setIsXNext] = useState(true)
+  const [showWinningLine, setShowWinningLine] = useState(false)
+  const [gameMode, setGameMode] = useState<'local' | 'ai' | null>(null)
 
-export function TicTacToeGame() {
-  const [data, setData] = useState<string[]>(initialData)
-  const [count, setCount] = useState(0)
-  const [lock, setLock] = useState(false)
-  const [winner, setWinner] = useState<string | null>(null)
+  const winInfo = calculateWinner(board)
+  const winner = winInfo ? winInfo.winner : null
+  const winningLine = winInfo ? winInfo.line : null
+  const isGameOver = winner || board.every(Boolean)
 
-  const toggle = (num: number) => {
-    if (lock || data[num] !== '') {
-      return
+  // 1. UseCallback para memorizar a função handleMove
+  const handleMove = useCallback(
+    (i: number) => {
+      // Se houver vencedor ou a casa já estiver preenchida, sair
+      if (winner || board[i]) return
+
+      const newBoard = board.slice()
+      newBoard[i] = isXNext ? 'x' : 'o'
+      setBoard(newBoard)
+      setIsXNext(!isXNext)
+      setShowWinningLine(false)
+    },
+    // 2. Dependências da função
+    [winner, board, isXNext],
+  )
+
+  // Agora podemos colocar handleMove na lista de dependências
+  useEffect(() => {
+    if (gameMode === 'ai' && !isXNext && !isGameOver) {
+      const timer = setTimeout(() => {
+        const aiMove = getAIMove(board)
+        handleMove(aiMove)
+      }, 1300)
+
+      return () => clearTimeout(timer)
     }
+  }, [isXNext, isGameOver, board, gameMode, handleMove])
 
-    const newData = [...data]
-    newData[num] = count % 2 === 0 ? 'x' : 'o'
-
-    setData(newData)
-    setCount(count + 1)
-    checkWin(newData)
-  }
-
-  const checkWin = (currentData: string[]) => {
-    const winningCombinations = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ]
-
-    for (const combination of winningCombinations) {
-      const [a, b, c] = combination
-      if (
-        currentData[a] &&
-        currentData[a] === currentData[b] &&
-        currentData[a] === currentData[c]
-      ) {
-        won(currentData[a])
-        return
-      }
+  useEffect(() => {
+    if (winningLine) {
+      const timer = setTimeout(() => setShowWinningLine(true), 50)
+      return () => clearTimeout(timer)
     }
+  }, [winningLine])
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setIsXNext(true)
+    setShowWinningLine(false)
+    setGameMode(null)
   }
 
-  const won = (winner: string) => {
-    setLock(true)
-    setWinner(winner)
+  let status
+  if (winner) {
+    status =
+      winner === 'x'
+        ? gameMode === 'ai'
+          ? 'você venceu!'
+          : 'jogador x venceu!'
+        : gameMode === 'ai'
+          ? 'ia venceu!'
+          : 'jogador o venceu!'
+  } else if (isGameOver) {
+    status = 'empate!'
+  } else if (isXNext) {
+    status = gameMode === 'ai' ? 'sua vez' : 'vez do jogador x'
+  } else {
+    status = gameMode === 'ai' ? 'ia está pensando...' : 'vez do jogador o'
   }
-
-  const reset = () => {
-    setLock(false)
-    setData(initialData)
-    setCount(0)
-    setWinner(null)
-  }
-
-  const { theme } = useTheme()
-
-  const isDarkMode = theme === 'dark'
 
   return (
-    <div className="text-center">
-      <h1 className="mt-12 mb-12 text-3xl lg:text-6xl text-black dark:text-white flex justify-center items-center">
-        {winner ? (
-          <>
-            Vencedor:
-            <Image
-              src={`/${winner === 'x' ? (isDarkMode ? 'whiteX' : 'blackX') : 'blueCircle'}.png`}
-              alt={`${winner === 'x' ? 'Cross' : 'Circle'} Icon`}
-              width={70}
-              height={70}
+    <div className="flex flex-col w-full justify-center items-center">
+      {!gameMode ? (
+        <GameModeSelection onSelectMode={setGameMode} />
+      ) : (
+        <>
+          <div className="relative w-72 h-72">
+            <Board
+              squares={board}
+              onClick={isXNext || gameMode === 'local' ? handleMove : () => {}}
             />
-          </>
-        ) : (
-          'Jogo da Velha'
-        )}
-      </h1>
-      <div className="grid grid-cols-3 gap-0 lg:gap-1 w-full lg:max-w-lg mx-auto">
-        {data.map((value, index) => (
-          <div
-            key={index}
-            className="flex h-24 w-24 lg:h-36 lg:w-36 bg-brand-color-600 border-4 border-brand-color-700 border-solid rounded-lg cursor-pointer justify-center items-center"
-            onClick={() => toggle(index)}
-          >
-            {value === 'x' && (
-              <Image
-                src="/whiteX.png"
-                alt="Cross Icon"
-                width={100}
-                height={100}
-              />
-            )}
-            {value === 'o' && (
-              <Image
-                src="/blueCircle.png"
-                alt="Circle Icon"
-                width={100}
-                height={100}
-              />
+            {showWinningLine && winningLine && (
+              <WinningLine start={winningLine[0]} end={winningLine[2]} />
             )}
           </div>
-        ))}
-      </div>
-      <button
-        className="w-full h-14 lg:h-20 text-white border-none outline-none cursor-pointer rounded-lg bg-primary text-xl lg:text-2xl mt-6 mb-8 hover:bg-primary/90"
-        onClick={reset}
-      >
-        Reiniciar
-      </button>
+          <div className="mt-4 h-16 flex flex-col items-center justify-center">
+            <div className="text-xl font-semibold text-primary lowercase">
+              <TypewriterText text={status} />
+            </div>
+            {isGameOver && (
+              <button
+                onClick={resetGame}
+                className="mt-2 cursor-pointer text-lg text-muted-foreground hover:text-primary transition-colors lowercase"
+              >
+                <TypewriterText text="jogar novamente" delay={100} />
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }
