@@ -6,6 +6,7 @@ import { Board } from './board'
 import { GameModeSelection } from './game-mode-selection'
 import { TypewriterText } from './type-writter-text'
 import { WinningLine } from './winning-line'
+import { Button } from './ui/button'
 
 export default function TicTacToe() {
   const [board, setBoard] = useState(Array(9).fill(null))
@@ -66,16 +67,16 @@ export default function TicTacToe() {
       winner === 'x'
         ? gameMode === 'ai'
           ? 'você venceu!'
-          : 'jogador x venceu!'
+          : 'jogador X venceu!'
         : gameMode === 'ai'
-          ? 'ia venceu!'
-          : 'jogador o venceu!'
+          ? 'IA venceu!'
+          : 'jogador O venceu!'
   } else if (isGameOver) {
     status = 'empate!'
   } else if (isXNext) {
-    status = gameMode === 'ai' ? 'sua vez' : 'vez do jogador x'
+    status = gameMode === 'ai' ? 'sua vez' : 'vez do jogador X'
   } else {
-    status = gameMode === 'ai' ? 'ia está pensando...' : 'vez do jogador o'
+    status = gameMode === 'ai' ? 'IA está pensando...' : 'vez do jogador O'
   }
 
   return (
@@ -94,16 +95,16 @@ export default function TicTacToe() {
             )}
           </div>
           <div className="mt-4 h-16 flex flex-col items-center justify-center">
-            <div className="text-xl font-semibold text-primary lowercase">
+            <div className="text-xl font-semibold text-primary ">
               <TypewriterText text={status} />
             </div>
             {isGameOver && (
-              <button
+              <Button
                 onClick={resetGame}
-                className="mt-2 cursor-pointer text-lg text-muted-foreground hover:text-primary transition-colors lowercase"
+                className="mt-2 cursor-pointer text-lg hover:text-primary transition-colors hover:bg-secondary"
               >
                 <TypewriterText text="jogar novamente" delay={100} />
-              </button>
+              </Button>
             )}
           </div>
         </>
