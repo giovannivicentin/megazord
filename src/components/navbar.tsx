@@ -47,7 +47,7 @@ export function Navbar() {
           </Link>
         </div>
         <div className="flex items-center space-x-4">
-          <Button asChild className="hidden md:inline-flex">
+          <Button asChild className="hidden md:inline-flex text-white">
             <Link href={randomPage} onClick={handleButtonClick}>
               Jogar Agora
             </Link>
