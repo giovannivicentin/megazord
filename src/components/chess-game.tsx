@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import { Chess, PieceSymbol } from 'chess.js'
-import { Button } from './ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Chess, PieceSymbol } from 'chess.js'
+import { AlertCircle } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+import { Button } from './ui/button'
 
 const Chessboard = dynamic(() => import('chessboardjsx'), {
   ssr: false,

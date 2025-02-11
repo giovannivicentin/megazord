@@ -5,6 +5,7 @@ import { Inter, Poppins, Open_Sans } from 'next/font/google'
 import { ReactNode } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Navbar } from '@/components/navbar'
+import { GlobalInfoButton } from '@/components/informative-button'
 import { Footer } from '@/components/footer'
 
 const inter = Inter({
@@ -57,6 +58,7 @@ export default function RootLayout({
           </header>
 
           {children}
+          <GlobalInfoButton />
         </ThemeProvider>
         <Footer />
       </body>
