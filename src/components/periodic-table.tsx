@@ -56,23 +56,30 @@ export default function PeriodicTable() {
   }
 
   return (
-    <div className="text-center">
-      <h1 className="text-3xl font-bold mb-8">Elementos da Tabela Periódica</h1>
-      {gameOver && <h2 className="p-5 text-3xl">Você Venceu!</h2>}
-      <div className="grid grid-cols-4 gap-5 mt-5">
+    <div className="text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto lg:w-3/5 xl:w-1/2">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8">
+        Elementos da Tabela Periódica
+      </h1>
+      {gameOver && (
+        <h2 className="p-3 sm:p-5 text-2xl sm:text-3xl">Você Venceu!</h2>
+      )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 md:gap-5 mt-3 sm:mt-5">
         {cards.map((card, index) => (
           <div
-            className={`flex justify-center text-4xl font-bold text-black items-center rounded-lg w-36 bg-primary h-36 transform cursor-pointer transition-transform duration-300 ${flipped.includes(index) || solved.includes(index) ? 'rotate-180' : ''}`}
+            className={`flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-white items-center rounded-lg w-full aspect-square bg-primary transform cursor-pointer transition-transform duration-300 ${flipped.includes(index) || solved.includes(index) ? 'rotate-180' : ''}`}
             key={index}
             onClick={() => handleClick(index)}
           >
             {flipped.includes(index) || solved.includes(index) ? (
-              <Image
-                className="rotate-180 rounded-lg"
-                src={`/memory-cards/${card}.png`}
-                fill
-                alt="Memory Card"
-              />
+              <div className="relative w-full h-full">
+                <Image
+                  className="rotate-180 rounded-lg"
+                  src={`/memory-cards/${card}.png`}
+                  fill
+                  alt="Memory Card"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                />
+              </div>
             ) : (
               '?'
             )}
@@ -81,7 +88,7 @@ export default function PeriodicTable() {
       </div>
       <button
         onClick={resetGame}
-        className="w-64 h-14 lg:h-20 text-white border-none outline-none cursor-pointer rounded-lg bg-primary text-xl lg:text-2xl mt-10 mb-8 hover:bg-primary/90"
+        className="w-full sm:w-64 h-12 sm:h-14 lg:h-16 text-white border-none outline-none cursor-pointer rounded-lg bg-primary text-lg sm:text-xl lg:text-2xl mt-6 sm:mt-8 mb-6 sm:mb-8 hover:bg-primary/90"
       >
         Reiniciar
       </button>
