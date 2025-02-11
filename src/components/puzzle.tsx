@@ -121,7 +121,7 @@ export function PuzzleGame() {
 
   return (
     <div className="flex flex-col items-center justify-center p-8 bg-transparent">
-      <h1 className="text-2xl font-bold mb-4">Quebra-Cabeça</h1>
+      <h1 className="text-3xl font-bold mb-6">Quebra-Cabeça</h1>
 
       {!solved && (
         <div
