@@ -1,30 +1,54 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { popup } from '../lib/popup-text'
 
-interface InfoButtonProps {
-  gameName: string
-}
-
-export function InfoButton({ gameName }: InfoButtonProps) {
+export function GlobalInfoButton() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
 
-  const currentItem = popup.find((item) => item.name === gameName)
+  const currentItem = popup.find(
+    (item) => item.pageToGo.replace('.tsx', '') === pathname,
+  )
 
   if (!currentItem) return null
 
   return (
-    <div className="relative mt-6">
+    <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-white bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center
-                   hover:bg-blue-700 transition-colors"
+        className="
+          fixed bottom-4 right-4
+          w-10 h-10
+          rounded-full
+          bg-blue-600
+          text-white text-xl font-bold
+          flex items-center justify-center
+          hover:bg-blue-700
+          transition-colors
+          z-50
+        "
       >
         i
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white max-w-md w-11/12 md:w-2/3 p-6 rounded shadow-lg relative">
+        <div
+          className="
+            fixed inset-0 flex items-center justify-center
+            bg-black bg-opacity-50
+            z-50
+          "
+        >
+          <div
+            className="
+              bg-white p-4 md:p-6
+              rounded shadow-lg
+              max-w-md w-11/12
+              relative
+            "
+          >
             <h2 className="text-xl font-semibold mb-3">{currentItem.name}</h2>
             <p className="mb-4">{currentItem.text}</p>
 
@@ -37,6 +61,6 @@ export function InfoButton({ gameName }: InfoButtonProps) {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

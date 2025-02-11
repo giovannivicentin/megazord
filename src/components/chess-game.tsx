@@ -1,6 +1,5 @@
 'use client'
 
-import { InfoButton } from '@/components/informative-button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import { Chess, PieceSymbol } from 'chess.js'
@@ -120,9 +119,6 @@ function ChessGame() {
         <Button className="w-40" variant="outline" onClick={handleUndoMove}>
           Desfazer Movimento
         </Button>
-      </div>
-      <div className="flex">
-        <InfoButton gameName="Xadrez" />
       </div>
     </>
   )

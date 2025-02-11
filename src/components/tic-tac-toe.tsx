@@ -3,7 +3,6 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { useState } from 'react'
-import { InfoButton } from '@/components/informative-button'
 
 const initialData = ['', '', '', '', '', '', '', '', '']
 
@@ -116,7 +115,6 @@ export function TicTacToeGame() {
       >
         Reiniciar
       </button>
-      <InfoButton gameName="Jogo da Velha" />
     </div>
   )
 }

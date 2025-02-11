@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils'
 import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from './ui/button'
-import { InfoButton } from '@/components/informative-button'
 
 const BOARD_SIZE = 8
 
@@ -233,7 +232,6 @@ export function CheckersGame() {
           Reiniciar Partida
         </Button>
       </div>
-      <InfoButton gameName="Damas" />
     </div>
   )
 }
