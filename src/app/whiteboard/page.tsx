@@ -1,9 +1,9 @@
 'use client'
-import type React from 'react'
-import { useRef, useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { Palette, Undo, Eraser, Download } from 'lucide-react'
+import { Download, Eraser, Palette, Undo } from 'lucide-react'
+import type React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Point {
   x: number
@@ -230,7 +230,7 @@ const WhiteboardPage: React.FC = () => {
         </div>
         <div className="sm:flex flex-row-reverse items-center justify-between block">
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4 pt-4">
-            <span className="text-sm font-medium ">Line Width:</span>
+            <span className="text-sm font-medium ">Largura:</span>
             <Slider
               value={[lineWidth]}
               onValueChange={(value) => setLineWidth(value[0])}
@@ -247,7 +247,7 @@ const WhiteboardPage: React.FC = () => {
               className="flex items-center"
             >
               <Undo className="h-4 w-4 mr-2" />
-              Undo
+              Desfazer
             </Button>
             <Button
               onClick={eraseAll}
@@ -255,7 +255,7 @@ const WhiteboardPage: React.FC = () => {
               className="flex items-center"
             >
               <Eraser className="h-4 w-4 mr-2" />
-              Erase All
+              Apagar Tudo
             </Button>
             <Button
               onClick={downloadCanvas}
@@ -270,8 +270,8 @@ const WhiteboardPage: React.FC = () => {
       </div>
 
       <p className="text-muted-foreground mt-4 text-center max-w-3xl">
-        Draw with your mouse or finger (on mobile). Use the color palette and
-        line width slider to customize your drawing.
+        Desenhe com o mouse ou com o dedo (no celular). Use a paleta de cores e
+        o controle deslizante de largura de linha para personalizar seu desenho.
       </p>
     </div>
   )
