@@ -125,7 +125,7 @@ export default function CalculadoraInfantil() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6 bg-white shadow rounded-md text-black">
+    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6 bg-white dark:bg-background shadow-lg rounded-md text-black dark:text-white border border-muted">
       <h1 className="text-2xl sm:text-3xl font-bold text-center">
         Jogo de Cálculo
       </h1>
@@ -198,7 +198,7 @@ export default function CalculadoraInfantil() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               onClick={handleVerify}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
+              className="inline-flex items-center dark:text-white justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
             >
               Verificar
             </Button>
