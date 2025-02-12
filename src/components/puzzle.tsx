@@ -21,7 +21,7 @@ export function PuzzleGame() {
     { board: Array<PuzzlePiece | null>; pieces: PuzzlePiece[] }[]
   >([])
 
-  const initializeGame = () => {
+  function initializeGame() {
     const initialPieces: PuzzlePiece[] = []
     for (let row = 0; row < PUZZLE_SIZE; row++) {
       for (let col = 0; col < PUZZLE_SIZE; col++) {
@@ -38,44 +38,49 @@ export function PuzzleGame() {
     initializeGame()
   }, [])
 
-  const handleDragStart = (
+  function handleDragStart(
     e: React.DragEvent<HTMLDivElement>,
     piece: PuzzlePiece,
     from: 'board' | 'pieces',
     index?: number,
-  ) => {
+  ) {
     e.dataTransfer.setData('pieceId', piece.id.toString())
     e.dataTransfer.setData('from', from)
-    if (index !== undefined) {
+    if (typeof index === 'number') {
       e.dataTransfer.setData('index', index.toString())
     }
   }
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault()
   }
 
-  const handleDrop = (
+  function handleDrop(
     e: React.DragEvent<HTMLDivElement>,
     dropIndex: number | 'pieces',
-  ) => {
+  ) {
     e.preventDefault()
     const pieceId = Number(e.dataTransfer.getData('pieceId'))
     const from = e.dataTransfer.getData('from') as 'board' | 'pieces'
     const fromIndex = e.dataTransfer.getData('index')
+
+    if (from === 'pieces' && dropIndex === 'pieces') {
+      return
+    }
+
+    if (from === 'board' && dropIndex !== 'pieces') {
+      return
+    }
+
     let draggedPiece: PuzzlePiece | undefined
 
     if (from === 'pieces') {
       draggedPiece = pieces.find((p) => p.id === pieceId)
       if (!draggedPiece) return
     } else {
-      if (fromIndex === null) return
+      if (!fromIndex) return
       draggedPiece = board[Number(fromIndex)] || undefined
       if (!draggedPiece) return
-    }
-
-    if (dropIndex === 'pieces' && from === 'pieces') {
-      return
     }
 
     setHistory((prev) => [...prev, { board: [...board], pieces: [...pieces] }])
@@ -88,31 +93,33 @@ export function PuzzleGame() {
       }
       setPieces((prev) => [...prev, draggedPiece!])
     } else {
-      const targetPiece = board[dropIndex]
-      if (targetPiece) return
-      if (from === 'pieces') {
-        setPieces((prev) => prev.filter((p) => p.id !== pieceId))
-      } else {
-        const newBoard = [...board]
-        newBoard[Number(fromIndex)] = null
-        setBoard(newBoard)
-      }
       const newBoard = [...board]
       newBoard[dropIndex] = draggedPiece
       setBoard(newBoard)
+
+      if (from === 'pieces') {
+        setPieces((prev) => prev.filter((p) => p.id !== pieceId))
+      } else {
+        const oldBoard = [...board]
+        oldBoard[Number(fromIndex)] = null
+        setBoard(oldBoard)
+        oldBoard[dropIndex] = draggedPiece
+        setBoard(oldBoard)
+      }
+
       checkSolved(newBoard)
     }
   }
 
-  const checkSolved = (currentBoard: Array<PuzzlePiece | null>) => {
+  function checkSolved(currentBoard: Array<PuzzlePiece | null>) {
     const isComplete = currentBoard.every(
       (piece, index) => piece && piece.id === index,
     )
     setSolved(isComplete)
   }
 
-  const handleUndoMove = () => {
-    if (history.length === 0 || solved) return
+  function handleUndoMove() {
+    if (!history.length || solved) return
     const lastState = history[history.length - 1]
     setBoard(lastState.board)
     setPieces(lastState.pieces)
@@ -140,7 +147,9 @@ export function PuzzleGame() {
                 height: IMAGE_SIZE / PUZZLE_SIZE,
                 backgroundImage: "url('/puzzle-pieces/puzzleGameImage.png')",
                 backgroundSize: `${IMAGE_SIZE}px ${IMAGE_SIZE}px`,
-                backgroundPosition: `-${piece.col * (IMAGE_SIZE / PUZZLE_SIZE)}px -${piece.row * (IMAGE_SIZE / PUZZLE_SIZE)}px`,
+                backgroundPosition: `-${
+                  piece.col * (IMAGE_SIZE / PUZZLE_SIZE)
+                }px -${piece.row * (IMAGE_SIZE / PUZZLE_SIZE)}px`,
               }}
             />
           ))}
@@ -155,7 +164,7 @@ export function PuzzleGame() {
             key={index}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, index)}
-            className="w-24 h-24 border-2 border-gray-300 flex items-center justify-center bg-transparent"
+            className="border-2 border-gray-300 flex items-center justify-center bg-transparent"
             style={{
               width: IMAGE_SIZE / PUZZLE_SIZE,
               height: IMAGE_SIZE / PUZZLE_SIZE,
@@ -164,7 +173,9 @@ export function PuzzleGame() {
                 : 'none',
               backgroundSize: `${IMAGE_SIZE}px ${IMAGE_SIZE}px`,
               backgroundPosition: piece
-                ? `-${piece.col * (IMAGE_SIZE / PUZZLE_SIZE)}px -${piece.row * (IMAGE_SIZE / PUZZLE_SIZE)}px`
+                ? `-${
+                    piece.col * (IMAGE_SIZE / PUZZLE_SIZE)
+                  }px -${piece.row * (IMAGE_SIZE / PUZZLE_SIZE)}px`
                 : 'none',
             }}
           >
@@ -187,14 +198,18 @@ export function PuzzleGame() {
 
       <div className="flex gap-3 mt-3 items-center justify-center">
         <button
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none 
+                     focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 
+                     bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
           onClick={() => window.location.reload()}
         >
           Reiniciar Partida
         </button>
 
         <button
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-40"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none 
+                     focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 
+                     border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-40"
           onClick={handleUndoMove}
           disabled={solved}
         >
