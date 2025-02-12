@@ -1,19 +1,32 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import { AlertCircle } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from './ui/button'
+import { GameBoard } from './checkers/game-board'
+import { GameInfo } from './checkers/game-info'
+import { MoveHistory } from './checkers/move-history'
 
-const BOARD_SIZE = 8
+const BOARD_SIZE = 10
 
 type PiecePosition = {
   row: number
   col: number
 } | null
 
-type Piece = 'pretas' | 'vermelhas' | 'pretas-king' | 'vermelhas-king' | null
+type Piece = 'white' | 'black' | 'white-king' | 'black-king' | null
+
+type GameState = {
+  board: Piece[][]
+  turn: 'white' | 'black'
+  moveHistory: string[]
+  mustCapture: boolean
+  lastMovedPiece: PiecePosition
+}
 
 export function CheckersGame() {
   const initialBoard: Piece[][] = Array(BOARD_SIZE)
@@ -22,33 +35,49 @@ export function CheckersGame() {
       Array(BOARD_SIZE)
         .fill(null)
         .map((_, col) =>
-          row < 3 && (row + col) % 2 !== 0
-            ? 'pretas'
-            : row > 4 && (row + col) % 2 !== 0
-              ? 'vermelhas'
+          row < 4 && (row + col) % 2 !== 0
+            ? 'black'
+            : row > 5 && (row + col) % 2 !== 0
+              ? 'white'
               : null,
         ),
     )
 
-  const [board, setBoard] = useState<Piece[][]>(initialBoard)
+  const [gameStates, setGameStates] = useState<GameState[]>([
+    {
+      board: initialBoard,
+      turn: 'white',
+      moveHistory: [],
+      mustCapture: false,
+      lastMovedPiece: null,
+    },
+  ])
+  const [currentStateIndex, setCurrentStateIndex] = useState(0)
   const [selectedPiece, setSelectedPiece] = useState<PiecePosition>(null)
-  const [turn, setTurn] = useState<'vermelhas' | 'pretas'>('vermelhas')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleCellClick = (row: number, col: number) => {
-    if (selectedPiece) {
-      if (isValidMove(selectedPiece.row, selectedPiece.col, row, col)) {
-        movePiece(selectedPiece.row, selectedPiece.col, row, col)
-        setTurn(turn === 'vermelhas' ? 'pretas' : 'vermelhas')
-        setErrorMessage('')
-      } else {
-        setErrorMessage('Movimento inválido!')
-      }
-      setSelectedPiece(null)
-    } else if (board[row][col]?.includes(turn)) {
-      setSelectedPiece({ row, col })
+  const currentState = gameStates[currentStateIndex]
+  const { board, turn, moveHistory, mustCapture, lastMovedPiece } = currentState
+
+  const checkWinner = useCallback(() => {
+    const whitePieces = board
+      .flat()
+      .filter((piece) => piece?.includes('white')).length
+    const blackPieces = board
+      .flat()
+      .filter((piece) => piece?.includes('black')).length
+
+    if (whitePieces === 0) return 'Pretas'
+    if (blackPieces === 0) return 'Brancas'
+    return null
+  }, [board])
+
+  useEffect(() => {
+    const winner = checkWinner()
+    if (winner) {
+      setErrorMessage(`Fim de jogo! As ${winner} venceram!`)
     }
-  }
+  }, [checkWinner])
 
   const isValidMove = (
     fromRow: number,
@@ -58,53 +87,69 @@ export function CheckersGame() {
   ): boolean => {
     const piece = board[fromRow][fromCol]
     if (!piece || board[toRow][toCol] !== null) return false
+    if (!piece.includes(turn)) return false
 
     const isKing = piece.includes('king')
-    const direction = piece.includes('vermelhas') ? -1 : 1
+    const rowDiff = toRow - fromRow
+    const colDiff = toCol - fromCol
+
+    if (Math.abs(rowDiff) !== Math.abs(colDiff)) return false
 
     if (isKing) {
-      const rowDiff = toRow - fromRow
-      const colDiff = toCol - fromCol
-      if (Math.abs(rowDiff) !== Math.abs(colDiff)) return false
-
-      const rowStep = rowDiff > 0 ? 1 : -1
-      const colStep = colDiff > 0 ? 1 : -1
-
-      let currentRow = fromRow + rowStep
-      let currentCol = fromCol + colStep
-      let encounteredPiece = false
-
-      while (currentRow !== toRow && currentCol !== toCol) {
-        if (
-          currentRow < 0 ||
-          currentRow >= BOARD_SIZE ||
-          currentCol < 0 ||
-          currentCol >= BOARD_SIZE
-        ) {
-          return false
-        }
-
-        if (board[currentRow][currentCol] !== null) {
-          if (encounteredPiece) return false
-          encounteredPiece = true
-        }
-        currentRow += rowStep
-        currentCol += colStep
-      }
-
-      return true
+      return isValidKingMove(fromRow, fromCol, toRow, toCol)
     } else {
-      const isSimpleMove =
-        toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1
-
-      const isCaptureMove =
-        toRow === fromRow + 2 * direction &&
-        Math.abs(toCol - fromCol) === 2 &&
-        !!board[(fromRow + toRow) / 2]?.[(fromCol + toCol) / 2] &&
-        !board[(fromRow + toRow) / 2]?.[(fromCol + toCol) / 2]?.includes(turn)
-
-      return isSimpleMove || isCaptureMove
+      return isValidRegularMove(fromRow, fromCol, toRow, toCol, piece)
     }
+  }
+
+  const isValidKingMove = (
+    fromRow: number,
+    fromCol: number,
+    toRow: number,
+    toCol: number,
+  ): boolean => {
+    const rowStep = toRow > fromRow ? 1 : -1
+    const colStep = toCol > fromCol ? 1 : -1
+    let row = fromRow + rowStep
+    let col = fromCol + colStep
+    let capturedPiece = null
+
+    while (row !== toRow && col !== toCol) {
+      if (board[row][col]) {
+        if (capturedPiece || board[row][col]?.includes(turn)) return false
+        capturedPiece = board[row][col]
+      }
+      row += rowStep
+      col += colStep
+    }
+
+    return !mustCapture || !!capturedPiece
+  }
+
+  const isValidRegularMove = (
+    fromRow: number,
+    fromCol: number,
+    toRow: number,
+    toCol: number,
+    piece: Piece,
+  ): boolean => {
+    const rowDiff = toRow - fromRow
+    const colDiff = Math.abs(toCol - fromCol)
+
+    if (colDiff > 2) return false
+
+    if (colDiff === 1 && !mustCapture) {
+      return piece?.includes('white') ? rowDiff < 0 : rowDiff > 0
+    }
+
+    if (colDiff === 2) {
+      const midRow = (fromRow + toRow) / 2
+      const midCol = (fromCol + toCol) / 2
+      const capturedPiece = board[midRow][midCol]
+      return !!capturedPiece && !capturedPiece.includes(turn)
+    }
+
+    return false
   }
 
   const movePiece = (
@@ -116,122 +161,219 @@ export function CheckersGame() {
     const newBoard = board.map((row) => [...row])
     let piece = newBoard[fromRow][fromCol]
 
-    if (piece?.includes('vermelhas') && toRow === 0) piece = 'vermelhas-king'
-    if (piece?.includes('pretas') && toRow === BOARD_SIZE - 1)
-      piece = 'pretas-king'
+    if (piece?.includes('white') && toRow === 0) piece = 'white-king'
+    if (piece?.includes('black') && toRow === BOARD_SIZE - 1)
+      piece = 'black-king'
 
     newBoard[toRow][toCol] = piece
     newBoard[fromRow][fromCol] = null
 
-    const rowDiff = Math.abs(toRow - fromRow)
-    const colDiff = Math.abs(toCol - fromCol)
-    if (rowDiff > 1 && colDiff > 1) {
-      const rowStep = (toRow - fromRow) / rowDiff
-      const colStep = (toCol - fromCol) / colDiff
+    const rowDiff = toRow - fromRow
+    const colDiff = toCol - fromCol
+    let captured = false
 
-      let currentRow = fromRow + rowStep
-      let currentCol = fromCol + colStep
+    if (Math.abs(rowDiff) >= 2 && Math.abs(colDiff) >= 2) {
+      const rowStep = rowDiff > 0 ? 1 : -1
+      const colStep = colDiff > 0 ? 1 : -1
+      let row = fromRow + rowStep
+      let col = fromCol + colStep
 
-      while (currentRow !== toRow && currentCol !== toCol) {
-        if (
-          currentRow >= 0 &&
-          currentRow < BOARD_SIZE &&
-          currentCol >= 0 &&
-          currentCol < BOARD_SIZE &&
-          board[currentRow][currentCol] !== null
-        ) {
-          newBoard[currentRow][currentCol] = null
+      while (row !== toRow && col !== toCol) {
+        if (newBoard[row][col]) {
+          newBoard[row][col] = null
+          captured = true
           break
         }
-        currentRow += rowStep
-        currentCol += colStep
+        row += rowStep
+        col += colStep
       }
     }
 
-    setBoard(newBoard)
+    const newMoveHistory = [
+      ...moveHistory,
+      `${fromRow},${fromCol} to ${toRow},${toCol}`,
+    ]
+    const canCaptureAgain =
+      captured && canCapture(toRow, toCol, newBoard, piece)
+    const newTurn = canCaptureAgain
+      ? turn
+      : turn === 'white'
+        ? 'black'
+        : 'white'
+
+    setGameStates((prevStates) => [
+      ...prevStates.slice(0, currentStateIndex + 1),
+      {
+        board: newBoard,
+        turn: newTurn,
+        moveHistory: newMoveHistory,
+        mustCapture: canCaptureAgain,
+        lastMovedPiece: canCaptureAgain ? { row: toRow, col: toCol } : null,
+      },
+    ])
+    setCurrentStateIndex((prevIndex) => prevIndex + 1)
+
+    return { captured, canCaptureAgain }
   }
 
-  const checkWinner = () => {
-    const redPieces = board
-      .flat()
-      .filter((piece) => piece?.includes('vermelhas')).length
-    const blackPieces = board
-      .flat()
-      .filter((piece) => piece?.includes('pretas')).length
+  const canCapture = (
+    row: number,
+    col: number,
+    currentBoard: Piece[][] = board,
+    piece: Piece = currentBoard[row][col],
+  ): boolean => {
+    if (!piece) return false
 
-    if (redPieces === 0) return 'As pretas venceram!'
-    if (blackPieces === 0) return 'As vermelhas venceram!'
-    return null
+    const isKing = piece.includes('king')
+    const directions = [-1, 1]
+
+    for (const rowDir of directions) {
+      for (const colDir of directions) {
+        if (isKing) {
+          let newRow = row + rowDir
+          let newCol = col + colDir
+          let foundOpponent = false
+
+          while (
+            newRow >= 0 &&
+            newRow < BOARD_SIZE &&
+            newCol >= 0 &&
+            newCol < BOARD_SIZE
+          ) {
+            if (currentBoard[newRow][newCol]) {
+              if (
+                foundOpponent ||
+                currentBoard[newRow][newCol]?.includes(piece.split('-')[0])
+              )
+                break
+              foundOpponent = true
+            } else if (foundOpponent) {
+              return true
+            }
+            newRow += rowDir
+            newCol += colDir
+          }
+        } else {
+          const newRow = row + rowDir * 2
+          const newCol = col + colDir * 2
+          if (
+            newRow >= 0 &&
+            newRow < BOARD_SIZE &&
+            newCol >= 0 &&
+            newCol < BOARD_SIZE
+          ) {
+            const midRow = row + rowDir
+            const midCol = col + colDir
+            if (
+              currentBoard[midRow][midCol] &&
+              !currentBoard[midRow][midCol]?.includes(piece.split('-')[0]) &&
+              !currentBoard[newRow][newCol]
+            ) {
+              return true
+            }
+          }
+        }
+      }
+    }
+    return false
   }
 
-  const winner = checkWinner()
+  const handleMove = (
+    fromRow: number,
+    fromCol: number,
+    toRow: number,
+    toCol: number,
+  ) => {
+    if (
+      mustCapture &&
+      lastMovedPiece &&
+      (fromRow !== lastMovedPiece.row || fromCol !== lastMovedPiece.col)
+    ) {
+      setErrorMessage('Você deve continuar capturando com a mesma peça!')
+      return
+    }
+
+    if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+      const moveResult = movePiece(fromRow, fromCol, toRow, toCol)
+      if (moveResult.canCaptureAgain) {
+        setSelectedPiece({ row: toRow, col: toCol })
+      } else {
+        setSelectedPiece(null)
+      }
+    } else {
+      setErrorMessage('Movimento inválido!')
+    }
+  }
+
+  const handleCellClick = (row: number, col: number) => {
+    if (selectedPiece) {
+      handleMove(selectedPiece.row, selectedPiece.col, row, col)
+    } else if (
+      board[row][col]?.includes(turn) &&
+      (!mustCapture ||
+        (lastMovedPiece &&
+          lastMovedPiece.row === row &&
+          lastMovedPiece.col === col))
+    ) {
+      setSelectedPiece({ row, col })
+    }
+  }
+
+  const handleUndo = () => {
+    if (currentStateIndex > 0) {
+      setCurrentStateIndex((prevIndex) => prevIndex - 1)
+      setSelectedPiece(null)
+      setErrorMessage('')
+    }
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center pt-8 px-4">
-      <h1 className="text-gray-900 dark:text-white text-3xl font-bold mb-8">
-        Jogo de Damas
-      </h1>
-      <div className="flex items-center">
-        <p
-          className={`my-2 text-lg text-center font-semibold text-gray-800 dark:text-white`}
-        >
-          É a vez das{' '}
-          <span
-            className={`font-bold ${turn === 'vermelhas' ? 'text-primary dark:text-white' : 'text-black dark:text-primary'} transition-colors duration-300`}
-          >
-            {turn}
-          </span>
-        </p>
-      </div>
-      {winner && (
-        <h2 className="text-gray-900 dark:text-white text-2xl mb-4">
-          {winner}
-        </h2>
-      )}
-      {errorMessage && (
-        <Alert
-          className={cn(
-            'fixed m-6 top-0 z-[100] flex w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col max-w-[210px] bg-secondary dark:bg-background dark:text-red-600 dark:border-2 dark:border-red-600',
-          )}
-          variant="destructive"
-        >
-          <AlertCircle className="h-5 w-5 text-red-600" />
-          <AlertTitle>Erro</AlertTitle>
-          <AlertDescription>{errorMessage}</AlertDescription>
-        </Alert>
-      )}
-      <div className="grid grid-cols-8 gap-0 border-2 border-black">
-        {board.map((row, rowIndex) =>
-          row.map((cell, colIndex) => (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              onClick={() => handleCellClick(rowIndex, colIndex)}
-              className={`w-16 h-16 flex items-center justify-center ${
-                (rowIndex + colIndex) % 2 === 0 ? 'bg-gray-300' : 'bg-gray-700'
-              } ${
-                selectedPiece &&
-                selectedPiece.row === rowIndex &&
-                selectedPiece.col === colIndex
-                  ? 'border-4 border-yellow-500'
-                  : ''
-              }`}
+    <DndProvider backend={HTML5Backend}>
+      <div className="flex flex-col lg:flex-row items-start justify-center gap-8 w-full max-w-7xl mx-auto p-4">
+        <div className="flex flex-col items-center">
+          <h1 className="text-3xl font-bold mb-4">Damas</h1>
+          <GameInfo turn={turn} mustCapture={mustCapture} />
+          <GameBoard
+            board={board}
+            selectedPiece={selectedPiece}
+            handleCellClick={handleCellClick}
+            handleMove={handleMove}
+            turn={turn}
+            mustCapture={mustCapture}
+            lastMovedPiece={lastMovedPiece}
+          />
+          <div className="flex gap-4 mt-4">
+            <Button
+              onClick={() => window.location.reload()}
+              className="text-white"
             >
-              {cell && (
-                <div
-                  className={`w-12 h-12 rounded-full ${
-                    cell.includes('vermelhas') ? 'bg-red-500' : 'bg-black'
-                  } ${cell.includes('king') ? 'border-4 border-gold' : ''}`}
-                ></div>
-              )}
-            </div>
-          )),
+              Reiniciar Jogo
+            </Button>
+            <Button
+              onClick={handleUndo}
+              className="text-white"
+              disabled={currentStateIndex === 0}
+            >
+              Desfazer Jogada
+            </Button>
+          </div>
+        </div>
+        <div className="w-full lg:w-64">
+          <MoveHistory moves={moveHistory} />
+        </div>
+        {errorMessage && (
+          <Alert
+            className={cn(
+              'fixed bottom-4 right-4 z-50 w-full max-w-xs',
+              'bg-destructive text-destructive-foreground',
+            )}
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Erro</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
         )}
       </div>
-      <div className="flex gap-4 mt-4">
-        <Button onClick={() => window.location.reload()}>
-          Reiniciar Partida
-        </Button>
-      </div>
-    </div>
+    </DndProvider>
   )
 }
