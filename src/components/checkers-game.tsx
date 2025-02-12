@@ -331,7 +331,7 @@ export function CheckersGame() {
     <DndProvider backend={HTML5Backend}>
       <div className="flex flex-col lg:flex-row items-start justify-center gap-8 w-full max-w-7xl mx-auto p-4">
         <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold mb-4">Damas Olímpicas</h1>
+          <h1 className="text-3xl font-bold mb-4">Damas</h1>
           <GameInfo turn={turn} mustCapture={mustCapture} />
           <GameBoard
             board={board}
