@@ -2,7 +2,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
-import { Chess, PieceSymbol } from 'chess.js'
+import { Chess, type PieceSymbol } from 'chess.js'
 import { AlertCircle } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
@@ -11,9 +11,11 @@ import { Button } from './ui/button'
 const Chessboard = dynamic(() => import('chessboardjsx'), {
   ssr: false,
   loading: () => (
-    <p className="animate-pulse animate-infinite animate-ease-linear flex items-center justify-center text-lg font-poppins">
-      Carregando...
-    </p>
+    <div className="animate-pulse flex items-center justify-center w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] bg-gray-300 dark:bg-gray-700 rounded-lg">
+      <p className="text-lg font-poppins text-gray-600 dark:text-gray-400">
+        Carregando...
+      </p>
+    </div>
   ),
 })
 
@@ -25,10 +27,27 @@ function ChessGame() {
   const [correctMoveSound, setCorrectMoveSound] = useState<
     HTMLAudioElement | undefined
   >()
+  const [boardWidth, setBoardWidth] = useState(300)
 
   useEffect(() => {
     const audio = new Audio('/sounds/move-chess.mp3')
     setCorrectMoveSound(audio)
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setBoardWidth(600)
+      } else if (window.innerWidth >= 768) {
+        setBoardWidth(600)
+      } else if (window.innerWidth >= 400) {
+        setBoardWidth(400)
+      } else {
+        setBoardWidth(350)
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
@@ -39,9 +58,6 @@ function ChessGame() {
       console.error('Failed to initialize game:', error)
     }
   }, [game])
-
-  const boardWidth =
-    typeof window !== 'undefined' && window.innerWidth > 600 ? 500 : 350
 
   const handleMove = (move: {
     from: string
@@ -73,33 +89,38 @@ function ChessGame() {
   }
 
   return (
-    <>
-      <div className="flex items-center">
-        <p
-          className={`my-2 text-lg text-center font-semibold text-gray-800 dark:text-white`}
-        >
+    <div className="flex flex-col items-center max-w-4xl w-full">
+      <div className="mb-4 text-center">
+        <p className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
           É a vez das{' '}
           <span
-            className={`font-bold ${player === 'Brancas' ? 'text-primary dark:text-white' : 'text-black dark:text-primary'} transition-colors duration-300`}
+            className={`font-bold ${
+              player === 'Brancas'
+                ? 'text-primary dark:text-white'
+                : 'text-black dark:text-primary'
+            } transition-colors duration-300`}
           >
             {player}
           </span>
         </p>
-
-        {errorMessage && (
-          <Alert
-            className={cn(
-              'fixed m-6 top-0 z-[100] flex w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col max-w-[210px] bg-secondary dark:bg-background dark:text-red-600 dark:border-2 dark:border-red-600',
-            )}
-            variant="destructive"
-          >
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            <AlertTitle>Erro</AlertTitle>
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        )}
       </div>
-      <div>
+
+      {errorMessage && (
+        <Alert
+          className={cn(
+            'fixed bottom-4 left-4 right-4 z-[100] flex items-center p-4 max-w-md mx-auto bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded-lg',
+          )}
+          variant="destructive"
+        >
+          <AlertCircle className="h-5 w-5 mr-2" />
+          <div>
+            <AlertTitle className="font-semibold">Erro</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </div>
+        </Alert>
+      )}
+
+      <div className="mb-6">
         <Chessboard
           width={boardWidth}
           position={fen}
@@ -112,15 +133,23 @@ function ChessGame() {
           }
         />
       </div>
-      <div className="flex gap-3 mt-3 items-center justify-center">
-        <Button className="w-40" onClick={() => window.location.reload()}>
+
+      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+        <Button
+          className="w-full sm:w-1/2"
+          onClick={() => window.location.reload()}
+        >
           Reiniciar Partida
         </Button>
-        <Button className="w-40" variant="outline" onClick={handleUndoMove}>
+        <Button
+          className="w-full sm:w-1/2"
+          variant="outline"
+          onClick={handleUndoMove}
+        >
           Desfazer Movimento
         </Button>
       </div>
-    </>
+    </div>
   )
 }
 

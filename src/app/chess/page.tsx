@@ -1,12 +1,12 @@
 import ChessGame from '@/components/chess-game'
 
-function ChessPage() {
+export default function ChessPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 pt-8">
-      <h1 className="text-3xl font-bold mb-8">Xadrez</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-background dark:bg-[unset]">
+      <h1 className="text-4xl md:text-5xl font-bold mb-8 text-gray-800 dark:text-white">
+        Xadrez
+      </h1>
       <ChessGame />
     </div>
   )
 }
-
-export default ChessPage

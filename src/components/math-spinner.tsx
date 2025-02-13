@@ -180,7 +180,7 @@ export default function CalculadoraInfantil() {
                     placeholder="Resposta"
                     value={userAnswers[index]}
                     onChange={(e) => handleChangeAnswer(index, e.target.value)}
-                    className="no-spinner border p-2 rounded w-full bg-white text-sm sm:text-base"
+                    className="no-spinner border p-2 rounded w-full text-sm sm:text-base bg-muted border-muted-foreground"
                     min={0}
                     step="1"
                   />
