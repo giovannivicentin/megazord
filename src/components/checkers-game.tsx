@@ -10,6 +10,7 @@ import { Button } from './ui/button'
 import { GameBoard } from './checkers/game-board'
 import { GameInfo } from './checkers/game-info'
 import { MoveHistory } from './checkers/move-history'
+import { Confetti } from './checkers/confetti'
 
 const BOARD_SIZE = 10
 
@@ -55,9 +56,23 @@ export function CheckersGame() {
   const [currentStateIndex, setCurrentStateIndex] = useState(0)
   const [selectedPiece, setSelectedPiece] = useState<PiecePosition>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [winner, setWinner] = useState<'white' | 'black' | null>(null)
 
-  const currentState = gameStates[currentStateIndex]
-  const { board, turn, moveHistory, mustCapture, lastMovedPiece } = currentState
+  const currentState = gameStates[currentStateIndex] || {
+    board: initialBoard,
+    turn: 'white',
+    moveHistory: [],
+    mustCapture: false,
+    lastMovedPiece: null,
+  }
+
+  const {
+    board,
+    turn,
+    moveHistory = [],
+    mustCapture,
+    lastMovedPiece,
+  } = currentState
 
   const checkWinner = useCallback(() => {
     const whitePieces = board
@@ -67,17 +82,26 @@ export function CheckersGame() {
       .flat()
       .filter((piece) => piece?.includes('black')).length
 
-    if (whitePieces === 0) return 'Pretas'
-    if (blackPieces === 0) return 'Brancas'
+    if (whitePieces === 0) return 'black'
+    if (blackPieces === 0) return 'white'
     return null
   }, [board])
 
   useEffect(() => {
-    const winner = checkWinner()
-    if (winner) {
-      setErrorMessage(`Fim de jogo! As ${winner} venceram!`)
+    const newWinner = checkWinner()
+    if (newWinner) {
+      setWinner(newWinner)
     }
   }, [checkWinner])
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage('')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [errorMessage])
 
   const isValidMove = (
     fromRow: number,
@@ -191,7 +215,7 @@ export function CheckersGame() {
 
     const newMoveHistory = [
       ...moveHistory,
-      `${fromRow},${fromCol} to ${toRow},${toCol}`,
+      `${fromRow},${fromCol} para ${toRow},${toCol}`,
     ]
     const canCaptureAgain =
       captured && canCapture(toRow, toCol, newBoard, piece)
@@ -297,6 +321,9 @@ export function CheckersGame() {
       const moveResult = movePiece(fromRow, fromCol, toRow, toCol)
       if (moveResult.canCaptureAgain) {
         setSelectedPiece({ row: toRow, col: toCol })
+        setErrorMessage(
+          'Captura obrigatória! Continue capturando com a mesma peça.',
+        )
       } else {
         setSelectedPiece(null)
       }
@@ -324,7 +351,24 @@ export function CheckersGame() {
       setCurrentStateIndex((prevIndex) => prevIndex - 1)
       setSelectedPiece(null)
       setErrorMessage('')
+      setWinner(null)
     }
+  }
+
+  const resetGame = () => {
+    setGameStates([
+      {
+        board: initialBoard,
+        turn: 'white',
+        moveHistory: [],
+        mustCapture: false,
+        lastMovedPiece: null,
+      },
+    ])
+    setCurrentStateIndex(0)
+    setSelectedPiece(null)
+    setErrorMessage('')
+    setWinner(null)
   }
 
   return (
@@ -343,10 +387,7 @@ export function CheckersGame() {
             lastMovedPiece={lastMovedPiece}
           />
           <div className="flex gap-4 mt-4">
-            <Button
-              onClick={() => window.location.reload()}
-              className="text-white"
-            >
+            <Button onClick={resetGame} className="text-white">
               Reiniciar Jogo
             </Button>
             <Button
@@ -373,6 +414,20 @@ export function CheckersGame() {
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
+        {winner && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white dark:bg-background p-8 rounded-lg text-center border border-muted">
+              <h2 className="text-2xl font-bold mb-4">
+                {winner === 'white' ? 'As peças brancas' : 'As peças pretas'}{' '}
+                venceram!
+              </h2>
+              <Button onClick={resetGame} className="text-white">
+                Jogar Novamente
+              </Button>
+            </div>
+          </div>
+        )}
+        {winner && <Confetti />}
       </div>
     </DndProvider>
   )
