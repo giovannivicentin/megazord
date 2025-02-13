@@ -269,7 +269,7 @@ const WhiteboardPage: React.FC = () => {
         </div>
       </div>
 
-      <p className="text-muted-foreground mt-4 text-center max-w-3xl">
+      <p className="text-muted-foreground my-4 text-center text-sm max-w-3xl">
         Desenhe com o mouse ou com o dedo (no celular). Use a paleta de cores e
         o controle deslizante de largura de linha para personalizar seu desenho.
       </p>
