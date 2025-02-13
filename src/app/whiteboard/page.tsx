@@ -193,7 +193,7 @@ const WhiteboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-neutral-50 dark:bg-[unset]">
-      <h1 className="text-3xl font-bold mb-6">Quadro Branco</h1>
+      <h1 className="text-3xl font-bold my-8">Quadro Branco</h1>
 
       <div
         ref={containerRef}
