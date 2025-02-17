@@ -21,6 +21,8 @@ export function PuzzleGame() {
     { board: Array<PuzzlePiece | null>; pieces: PuzzlePiece[] }[]
   >([])
 
+  const [selectedPiece, setSelectedPiece] = useState<PuzzlePiece | null>(null)
+
   function initializeGame() {
     const initialPieces: PuzzlePiece[] = []
     for (let row = 0; row < PUZZLE_SIZE; row++) {
@@ -32,6 +34,7 @@ export function PuzzleGame() {
     setBoard(Array(PUZZLE_SIZE * PUZZLE_SIZE).fill(null))
     setSolved(false)
     setHistory([])
+    setSelectedPiece(null)
   }
 
   useEffect(() => {
@@ -64,13 +67,8 @@ export function PuzzleGame() {
     const from = e.dataTransfer.getData('from') as 'board' | 'pieces'
     const fromIndex = e.dataTransfer.getData('index')
 
-    if (from === 'pieces' && dropIndex === 'pieces') {
-      return
-    }
-
-    if (from === 'board' && dropIndex !== 'pieces') {
-      return
-    }
+    if (from === 'pieces' && dropIndex === 'pieces') return
+    if (from === 'board' && dropIndex !== 'pieces') return
 
     let draggedPiece: PuzzlePiece | undefined
 
@@ -111,6 +109,32 @@ export function PuzzleGame() {
     }
   }
 
+  function handlePieceClick(piece: PuzzlePiece) {
+    if (selectedPiece?.id === piece.id) {
+      setSelectedPiece(null)
+    } else {
+      setSelectedPiece(piece)
+    }
+  }
+
+  function handleBoardClick(index: number) {
+    if (!selectedPiece) return
+
+    if (board[index] !== null) return
+
+    setHistory((prev) => [...prev, { board: [...board], pieces: [...pieces] }])
+
+    const newBoard = [...board]
+    newBoard[index] = selectedPiece
+    setBoard(newBoard)
+
+    setPieces((prev) => prev.filter((p) => p.id !== selectedPiece.id))
+
+    checkSolved(newBoard)
+
+    setSelectedPiece(null)
+  }
+
   function checkSolved(currentBoard: Array<PuzzlePiece | null>) {
     const isComplete = currentBoard.every(
       (piece, index) => piece && piece.id === index,
@@ -141,7 +165,12 @@ export function PuzzleGame() {
               key={piece.id}
               draggable
               onDragStart={(e) => handleDragStart(e, piece, 'pieces')}
-              className="cursor-grab border-2 border-blue-500 hover:border-blue-700 transition-all"
+              onClick={() => handlePieceClick(piece)}
+              className={`cursor-grab border-2 transition-all ${
+                selectedPiece?.id === piece.id
+                  ? 'border-white'
+                  : 'border-blue-500 hover:border-blue-700'
+              }`}
               style={{
                 width: IMAGE_SIZE / PUZZLE_SIZE,
                 height: IMAGE_SIZE / PUZZLE_SIZE,
@@ -164,6 +193,7 @@ export function PuzzleGame() {
             key={index}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, index)}
+            onClick={() => handleBoardClick(index)}
             className="border-2 border-gray-300 flex items-center justify-center bg-transparent"
             style={{
               width: IMAGE_SIZE / PUZZLE_SIZE,
