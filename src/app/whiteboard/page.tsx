@@ -45,6 +45,20 @@ const WhiteboardPage: React.FC = () => {
     lineWidth: 4,
   })
 
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDrawing) {
+        e.preventDefault()
+      }
+    }
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isDrawing])
+
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
