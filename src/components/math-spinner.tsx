@@ -195,7 +195,7 @@ export default function CalculadoraInfantil() {
               </div>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div className="flex flex-shrink sm:flex-row justify-center items-center gap-4">
             <Button
               onClick={handleVerify}
               className="inline-flex items-center dark:text-white justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-40"
